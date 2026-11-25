@@ -14,312 +14,345 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap">
 <style>
-/* Layout: one phone column of soft clay blocks — ring, next-set reminder, sets, big clay tap button, stats, calories, settings */
+/* Layout: three pages (วันนี้ / สถิติ / ตั้งค่า) under a floating clay tab bar; "วันนี้" fits one phone screen */
 :root{
   --bg:#E4ECF6; --clay:#F3F7FC; --ink:#26304A; --muted:#66708A;
   --coral:#FF8C6B; --coral-ink:#3A1408; --mint:#8EDDBB; --lilac:#BBA9F7; --sun:#FFD27A;
   --hi:rgba(255,255,255,.85); --lo:rgba(70,90,130,.18); --drop:rgba(70,90,130,.22);
+  --icon-accent:#BBA9F7;
   --display:"Mitr","IBM Plex Sans Thai Looped",system-ui,sans-serif;
   --body:"IBM Plex Sans Thai Looped",system-ui,-apple-system,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#1C2030; --clay:#2A3046; --ink:#EEF1FA; --muted:#A4ACC4;
-  --coral:#FF8C6B; --coral-ink:#2A0E05; --mint:#5FC79C; --lilac:#9E89F0; --sun:#F2C45E;
-  --hi:rgba(255,255,255,.08); --lo:rgba(0,0,0,.35); --drop:rgba(0,0,0,.45); color-scheme:dark}}
+  --mint:#5FC79C; --lilac:#9E89F0; --sun:#F2C45E;
+  --hi:rgba(255,255,255,.08); --lo:rgba(0,0,0,.35); --drop:rgba(0,0,0,.45); --icon-accent:#6E5CC4; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#1C2030; --clay:#2A3046; --ink:#EEF1FA; --muted:#A4ACC4;
-  --coral:#FF8C6B; --coral-ink:#2A0E05; --mint:#5FC79C; --lilac:#9E89F0; --sun:#F2C45E;
-  --hi:rgba(255,255,255,.08); --lo:rgba(0,0,0,.35); --drop:rgba(0,0,0,.45); color-scheme:dark}
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  --mint:#5FC79C; --lilac:#9E89F0; --sun:#F2C45E;
+  --hi:rgba(255,255,255,.08); --lo:rgba(0,0,0,.35); --drop:rgba(0,0,0,.45); --icon-accent:#6E5CC4; color-scheme:dark}
+:root{padding-top:env(safe-area-inset-top,0px)}
 html{-webkit-text-size-adjust:100%}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px}
-main{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-.clay{background:var(--clay);border-radius:28px;padding:18px;
-  box-shadow:10px 12px 24px var(--drop), inset -6px -8px 14px var(--lo), inset 6px 6px 12px var(--hi)}
-.clay-in{border-radius:18px;box-shadow:inset 4px 4px 10px var(--lo), inset -4px -4px 10px var(--hi)}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-h1{font-family:var(--display);font-weight:600;font-size:26px;margin:0}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));
+  padding-top:12px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}
+main{max-width:460px;margin:0 auto}
+.page{display:flex;flex-direction:column;gap:12px}
+.ic{width:22px;height:22px;flex:none;color:currentColor}
+.ic.sm{width:18px;height:18px}
+.clay{background:var(--clay);border-radius:24px;padding:14px;
+  box-shadow:8px 10px 20px var(--drop), inset -5px -6px 12px var(--lo), inset 5px 5px 10px var(--hi)}
+.well{border-radius:16px;box-shadow:inset 3px 3px 8px var(--lo), inset -3px -3px 8px var(--hi)}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{font-family:var(--display);font-weight:600;font-size:22px;margin:0}
+h2{font-family:var(--display);font-weight:500;font-size:14px;margin:0 0 10px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .date{color:var(--muted);font-size:13px}
-h2{font-family:var(--display);font-weight:500;font-size:15px;margin:0 0 12px;color:var(--muted)}
 .num{font-family:var(--display);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
 
-.hero{display:grid;grid-template-columns:148px 1fr;gap:16px;align-items:center}
-.ring{position:relative;width:148px;height:148px;border-radius:50%;padding:10px}
+/* today: hero */
+.hero{display:grid;grid-template-columns:118px 1fr;gap:14px;align-items:center}
+.ring{position:relative;width:118px;height:118px;border-radius:50%;padding:8px}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.ring .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring .big{font-size:42px;font-weight:600;line-height:1}
-.ring .of{color:var(--muted);font-size:12px}
-.stats{display:flex;flex-direction:column;gap:8px;min-width:0}
-.stat .v{font-size:24px;font-weight:500;line-height:1.15}
-.stat .l{color:var(--muted);font-size:12.5px}
-.pill{display:inline-block;align-self:flex-start;padding:4px 12px;border-radius:99px;font-size:13px;font-weight:600;background:var(--lilac);color:#1D1640;
-  box-shadow:inset -2px -3px 5px rgba(0,0,0,.12), inset 2px 2px 4px rgba(255,255,255,.5)}
-.pill.ok{background:var(--mint);color:#0E2C20}
+.ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .big{font-size:34px;font-weight:600;line-height:1}
+.ring .of{color:var(--muted);font-size:11px}
+.facts{display:flex;flex-direction:column;gap:8px;min-width:0}
+.fact{display:flex;align-items:center;gap:8px;min-width:0}
+.fact .ic{color:var(--muted)}
+.fact b{font-family:var(--display);font-weight:500;font-size:18px;font-variant-numeric:tabular-nums}
+.fact span{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fact.due .ic{color:var(--coral)}
+.fact.due b{color:var(--coral)}
 
-.next{display:flex;align-items:center;gap:14px}
-.next .bell{flex:none;width:52px;height:52px;border-radius:18px;background:var(--sun);display:grid;place-items:center;
-  box-shadow:4px 5px 10px var(--drop), inset -3px -4px 6px rgba(0,0,0,.12), inset 3px 3px 6px rgba(255,255,255,.55)}
-.next .bell svg{width:26px;height:26px}
-.next .t{font-family:var(--display);font-size:20px;font-weight:500;line-height:1.2}
-.next .s{color:var(--muted);font-size:13px}
-.next.due .bell{background:var(--coral);animation:wob 1.2s ease-in-out infinite}
-@keyframes wob{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+/* sets strip */
+.sets{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.sets::-webkit-scrollbar{display:none}
+.set{flex:0 0 auto;min-width:62px;border-radius:14px;padding:6px 8px;text-align:center;display:flex;flex-direction:column}
+.set .sv{font-family:var(--display);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.set .st{font-size:10.5px;opacity:.75;font-variant-numeric:tabular-nums;white-space:nowrap}
+.set.todo{box-shadow:inset 2px 2px 6px var(--lo), inset -2px -2px 6px var(--hi);color:var(--muted)}
+.set.done{background:var(--mint);color:#0E2C20;box-shadow:2px 3px 6px var(--drop), inset -2px -3px 5px rgba(0,0,0,.12), inset 2px 2px 4px rgba(255,255,255,.45)}
+.set.now{background:var(--lilac);color:#1D1640;box-shadow:2px 3px 6px var(--drop), inset -2px -3px 5px rgba(0,0,0,.12), inset 2px 2px 4px rgba(255,255,255,.45)}
 
-.sets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.set{border-radius:18px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;gap:1px;min-width:0}
-.set .sn{font-size:11px;color:var(--muted)}
-.set .sv{font-family:var(--display);font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
-.set .st{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.set.todo{box-shadow:inset 3px 3px 7px var(--lo), inset -3px -3px 7px var(--hi)}
-.set.done{background:var(--mint);color:#0E2C20;box-shadow:3px 4px 8px var(--drop), inset -3px -4px 6px rgba(0,0,0,.12), inset 3px 3px 6px rgba(255,255,255,.45)}
-.set.done .sn,.set.done .st{color:#22513D}
-.set.now{background:var(--lilac);color:#1D1640;box-shadow:3px 4px 8px var(--drop), inset -3px -4px 6px rgba(0,0,0,.12), inset 3px 3px 6px rgba(255,255,255,.45)}
-.set.now .sn,.set.now .st{color:#3E3270}
-.setmeta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--muted)}
-.linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font:inherit;cursor:pointer}
-
-.tabs{display:flex;gap:6px;padding:6px;border-radius:22px}
-.tabs button{flex:1;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:16px;font-family:var(--display);font-size:15px;cursor:pointer}
-.tabs button[aria-selected="true"]{background:var(--clay);color:var(--ink);box-shadow:4px 4px 10px var(--drop), inset -2px -3px 6px var(--lo), inset 2px 2px 5px var(--hi)}
-
-.stack{display:flex;flex-direction:column;gap:14px}
-.tap{width:100%;min-height:160px;border:0;border-radius:36px;background:var(--coral);color:var(--coral-ink);font-family:var(--display);font-size:40px;font-weight:600;
-  cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .1s, box-shadow .1s;
-  box-shadow:10px 14px 26px var(--drop), inset -10px -12px 20px rgba(0,0,0,.14), inset 10px 10px 18px rgba(255,255,255,.45)}
-.tap small{display:block;font-family:var(--body);font-size:15px;font-weight:600;opacity:.8}
-.tap:active{transform:scale(.97);box-shadow:4px 6px 12px var(--drop), inset -6px -8px 14px rgba(0,0,0,.16), inset 8px 8px 16px rgba(255,255,255,.35)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.btn{flex:1 1 0;min-width:60px;padding:13px 8px;border-radius:20px;border:0;background:var(--clay);color:var(--ink);font-family:var(--display);font-size:17px;cursor:pointer;touch-action:manipulation;
-  box-shadow:5px 6px 12px var(--drop), inset -3px -4px 8px var(--lo), inset 3px 3px 7px var(--hi);transition:transform .1s}
+/* counter */
+.counter{display:flex;flex-direction:column;gap:10px}
+.seg{display:flex;gap:4px;padding:4px;border-radius:16px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);padding:8px 6px;border-radius:12px;font-family:var(--display);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.seg button[aria-pressed="true"]{background:var(--clay);color:var(--ink);box-shadow:3px 3px 8px var(--drop), inset -2px -2px 5px var(--lo), inset 2px 2px 4px var(--hi)}
+.tap{position:relative;width:100%;height:150px;border:0;border-radius:32px;background:var(--coral);color:var(--coral-ink);font-family:var(--display);
+  cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .1s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  box-shadow:8px 12px 22px var(--drop), inset -10px -12px 20px rgba(0,0,0,.14), inset 10px 10px 18px rgba(255,255,255,.45)}
+.tap .p1{font-size:44px;font-weight:600;line-height:1}
+.tap .p2{font-size:15px;font-weight:500;opacity:.85}
+.tap:active{transform:scale(.97)}
+.tap .bar{position:absolute;left:22px;right:22px;bottom:16px;height:8px;border-radius:99px;background:rgba(58,20,8,.15);overflow:hidden}
+.tap .bar i{display:block;height:100%;width:0;background:rgba(58,20,8,.55);border-radius:99px;transition:width .2s}
+.row{display:flex;gap:8px}
+.btn{flex:1 1 0;min-width:0;padding:11px 6px;border-radius:16px;border:0;background:var(--clay);color:var(--ink);font-family:var(--display);font-size:16px;cursor:pointer;touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:4px 5px 10px var(--drop), inset -3px -3px 6px var(--lo), inset 3px 3px 6px var(--hi);transition:transform .1s}
 .btn:active{transform:scale(.96)}
-.btn.dark{background:var(--ink);color:var(--bg)}
+.btn.dark{background:var(--ink);color:var(--bg);flex-grow:1.6;white-space:nowrap}
 .btn.mint{background:var(--mint);color:#0E2C20}
 .btn.coral{background:var(--coral);color:var(--coral-ink)}
+.btn.ghost{box-shadow:none;background:transparent;color:var(--muted);text-decoration:underline;font-family:var(--body);font-size:13px;padding:4px}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted)}
+.stepper .round{flex:none;width:36px;height:36px;padding:0;border-radius:50%;font-size:20px}
+.stepper b{font-family:var(--display);font-size:17px;color:var(--ink);font-weight:500}
+.cue{height:150px;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.cue .big{font-family:var(--display);font-size:44px;font-weight:600;color:var(--coral);line-height:1}
+.cue .sm{font-size:13px;color:var(--muted)}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
 
-.target{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px}
-.target .lbl{font-size:13px;color:var(--muted)}
-.target .val{font-family:var(--display);font-size:22px;font-weight:600;min-width:3ch;text-align:center}
-.round{width:44px;height:44px;flex:none;border-radius:50%;padding:0;font-size:22px;min-width:0}
-.cue{text-align:center;font-family:var(--display);font-size:44px;font-weight:600;min-height:64px;color:var(--coral)}
-.hint{color:var(--muted);font-size:13px;margin:0}
-
-.hr{display:flex;flex-direction:column;gap:10px}
-.hr .q{font-family:var(--display);font-size:17px}
-.hr-row{display:flex;gap:10px;align-items:center}
-.hr-row input{flex:1;min-width:0;font-size:22px;font-family:var(--display);padding:10px 14px;border:0;background:var(--bg);color:var(--ink);border-radius:16px;
-  box-shadow:inset 3px 3px 8px var(--lo), inset -3px -3px 8px var(--hi)}
-.hr-row .btn{flex:none;padding-inline:16px}
-.zone{font-size:13px;color:var(--muted)}
-
-.streakline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.streakline .v{font-size:22px}
-.bars{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;align-items:end;height:90px;padding:8px;border-radius:18px}
-.bar{background:var(--lilac);border-radius:6px;min-height:4px;opacity:.75}
-.bar.hit{background:var(--mint);opacity:1}
-.bar.today{box-shadow:0 0 0 2px var(--coral)}
-.barlabels{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;font-size:10px;color:var(--muted);text-align:center;margin-top:4px;padding-inline:8px}
-
-.calc table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
-.calc td{padding:7px 0;border-bottom:1px dashed var(--lo)}
-.calc td:last-child{text-align:right;font-family:var(--display);font-weight:500}
-details summary{cursor:pointer;font-family:var(--display);font-size:16px}
-.form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.form label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted);min-width:0}
-.form input,.form select{font-size:16px;padding:10px 12px;border:0;border-radius:14px;background:var(--bg);color:var(--ink);width:100%;min-width:0;font-family:var(--display);
+/* stats */
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kv .v{font-family:var(--display);font-size:22px;font-weight:500;line-height:1.15;font-variant-numeric:tabular-nums}
+.kv .l{font-size:12px;color:var(--muted)}
+.bars{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;align-items:end;height:96px;padding:8px;margin-top:12px}
+.bars .b{background:var(--lilac);border-radius:6px;min-height:4px;opacity:.75}
+.bars .b.hit{background:var(--mint);opacity:1}
+.bars .b.today{box-shadow:0 0 0 2px var(--coral)}
+.blabels{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;font-size:10px;color:var(--muted);text-align:center;margin-top:4px;padding-inline:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.tbl td{padding:7px 0;border-bottom:1px dashed var(--lo)}
+.tbl td:last-child{text-align:right;font-family:var(--display);font-weight:500}
+.hint{color:var(--muted);font-size:12.5px;margin:8px 0 0}
+.inrow{display:flex;gap:8px;align-items:center;margin-top:10px}
+.inrow input{flex:1;min-width:0;font-size:18px;font-family:var(--display);padding:9px 12px;border:0;background:var(--bg);color:var(--ink);border-radius:14px;
   box-shadow:inset 3px 3px 7px var(--lo), inset -3px -3px 7px var(--hi)}
-.form .full{grid-column:1/-1}
-.sync{font-size:12px;color:var(--muted);text-align:center}
-@media (prefers-reduced-motion:reduce){.tap,.btn{transition:none}.next.due .bell{animation:none}}
+.inrow .btn{flex:none;padding-inline:16px}
+
+/* settings */
+.group{display:flex;flex-direction:column;gap:2px;padding:6px 14px}
+.item{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px dashed var(--lo)}
+.item:last-child{border-bottom:0}
+.item .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.item .name{font-size:14.5px}
+.item .val{font-family:var(--display);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+.item .sub{font-size:12px;color:var(--muted)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:12px;border-radius:99px;background:var(--bg);box-shadow:inset 2px 2px 5px var(--lo), inset -2px -2px 5px var(--hi);margin:4px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--coral);border:0;box-shadow:2px 3px 6px var(--drop), inset -2px -3px 5px rgba(0,0,0,.15), inset 2px 2px 4px rgba(255,255,255,.5)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--coral);border:0}
+.switch{position:relative;width:52px;height:30px;flex:none}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.switch span{position:absolute;inset:0;border-radius:99px;background:var(--bg);box-shadow:inset 2px 2px 6px var(--lo), inset -2px -2px 6px var(--hi);transition:background .2s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--clay);box-shadow:2px 2px 5px var(--drop);transition:transform .2s}
+.switch input:checked + span{background:var(--mint)}
+.switch input:checked + span::after{transform:translateX(22px)}
+.switch input:focus-visible + span{outline:3px solid var(--lilac);outline-offset:2px}
+.times{display:flex;gap:8px}
+.times input{flex:1;min-width:0;font-size:16px;font-family:var(--display);padding:8px 10px;border:0;border-radius:12px;background:var(--bg);color:var(--ink);box-shadow:inset 2px 2px 6px var(--lo), inset -2px -2px 6px var(--hi)}
+.credit{text-align:center;font-size:11.5px;color:var(--muted)}
+.credit a{color:var(--muted)}
+
+/* tab bar */
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:20;
+  width:min(420px, calc(100% - 28px));display:flex;gap:6px;padding:6px;border-radius:24px;background:var(--clay);
+  box-shadow:8px 10px 24px var(--drop), inset -3px -4px 8px var(--lo), inset 3px 3px 6px var(--hi)}
+.tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 4px;border-radius:18px;color:var(--muted);text-decoration:none;font-size:11.5px;font-family:var(--display)}
+.tabbar a[aria-current="page"]{color:var(--ink);background:var(--bg);box-shadow:inset 2px 2px 6px var(--lo), inset -2px -2px 6px var(--hi)}
+
+/* sheet + onboarding */
+.scrim{position:fixed;inset:0;background:rgba(20,24,40,.35);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:min(460px,100%);margin:0 10px calc(env(safe-area-inset-bottom,0px) + 10px);display:flex;flex-direction:column;gap:10px}
+.sheet .q{font-family:var(--display);font-size:18px;display:flex;align-items:center;gap:8px}
 .onb{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;
-  padding:calc(env(safe-area-inset-top,0px) + 28px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 28px) max(16px,env(safe-area-inset-left,0px))}
-.onb .in{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-.onb h1{font-size:30px}
+  padding:calc(env(safe-area-inset-top,0px) + 24px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 24px) max(16px,env(safe-area-inset-left,0px))}
+.onb .in{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.onb h1{font-size:28px}
 .onb p{margin:0;color:var(--muted)}
-.seg{display:flex;gap:8px}
-.seg button{flex:1}
-.seg button[aria-pressed="true"]{background:var(--lilac);color:#1D1640}
-.err{color:#C0392B;font-size:13px;min-height:1.2em}
-.minirow{display:flex;gap:10px;flex-wrap:wrap}
-.minirow .btn{font-size:15px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 90px);z-index:30;background:var(--ink);color:var(--bg);
+  padding:8px 14px;border-radius:14px;font-size:13px;max-width:calc(100% - 40px);text-align:center;box-shadow:4px 6px 14px var(--drop)}
+@media (prefers-reduced-motion:reduce){.tap,.btn,.tap .bar i,.switch span,.switch span::after{transition:none}}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-settings" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M10.4 5.6 10.62 3.31H13.38L13.6 5.6C14.233 5.756 14.84 6.006 15.4 6.34L17.17 4.88L19.12 6.83L17.66 8.6C17.994 9.16 18.244 9.767 18.4 10.4L20.69 10.62V13.38L18.4 13.6C18.244 14.233 17.994 14.84 17.66 15.4L19.12 17.17L17.17 19.12L15.4 17.66C14.84 17.994 14.233 18.244 13.6 18.4L13.38 20.69H10.62L10.4 18.4C9.767 18.244 9.16 17.994 8.6 17.66L6.83 19.12L4.88 17.17L6.34 15.4C6.006 14.84 5.756 14.233 5.6 13.6L3.31 13.38V10.62L5.6 10.4C5.756 9.767 6.006 9.16 6.34 8.6L4.88 6.83L6.83 4.88L8.6 6.34C9.16 6.006 9.767 5.756 10.4 5.6ZM12 9.2C10.454 9.2 9.2 10.454 9.2 12C9.2 13.546 10.454 14.8 12 14.8C13.546 14.8 14.8 13.546 14.8 12C14.8 10.454 13.546 9.2 12 9.2Z"/><path fill="currentColor" d="M9.586 4.927 9.749 3.226Q9.757 3.146 9.779 3.068Q9.801 2.99 9.838 2.918Q9.874 2.846 9.923 2.781Q9.972 2.717 10.032 2.662Q10.091 2.608 10.16 2.565Q10.229 2.523 10.305 2.494Q10.38 2.465 10.46 2.45Q10.539 2.435 10.62 2.435H13.38Q13.461 2.435 13.54 2.45Q13.62 2.465 13.695 2.494Q13.771 2.523 13.84 2.565Q13.909 2.608 13.968 2.662Q14.028 2.717 14.077 2.781Q14.126 2.846 14.162 2.918Q14.199 2.99 14.221 3.068Q14.243 3.146 14.251 3.226L14.414 4.927Q14.868 5.08 15.298 5.29L16.613 4.205Q16.676 4.154 16.746 4.114Q16.817 4.075 16.894 4.05Q16.971 4.024 17.051 4.013Q17.131 4.002 17.212 4.006Q17.293 4.01 17.371 4.028Q17.45 4.047 17.524 4.08Q17.598 4.113 17.665 4.158Q17.732 4.204 17.789 4.261L19.739 6.211Q19.796 6.268 19.842 6.335Q19.887 6.402 19.92 6.476Q19.953 6.55 19.972 6.629Q19.99 6.707 19.994 6.788Q19.998 6.869 19.987 6.949Q19.976 7.029 19.95 7.106Q19.925 7.183 19.886 7.254Q19.846 7.324 19.795 7.387L18.71 8.702Q18.92 9.132 19.073 9.586L20.774 9.749Q20.854 9.757 20.932 9.779Q21.01 9.801 21.082 9.838Q21.154 9.874 21.219 9.923Q21.283 9.972 21.338 10.032Q21.392 10.091 21.435 10.16Q21.477 10.229 21.506 10.305Q21.535 10.38 21.55 10.46Q21.565 10.539 21.565 10.62V13.38Q21.565 13.461 21.55 13.54Q21.535 13.62 21.506 13.695Q21.477 13.771 21.435 13.84Q21.392 13.909 21.338 13.968Q21.283 14.028 21.219 14.077Q21.154 14.126 21.082 14.162Q21.01 14.199 20.932 14.221Q20.854 14.243 20.774 14.251L19.073 14.414Q18.92 14.868 18.71 15.298L19.795 16.613Q19.846 16.676 19.886 16.746Q19.925 16.817 19.95 16.894Q19.976 16.971 19.987 17.051Q19.998 17.131 19.994 17.212Q19.99 17.293 19.972 17.371Q19.953 17.45 19.92 17.524Q19.887 17.598 19.842 17.665Q19.796 17.732 19.739 17.789L17.789 19.739Q17.732 19.796 17.665 19.842Q17.598 19.887 17.524 19.92Q17.45 19.953 17.371 19.972Q17.293 19.99 17.212 19.994Q17.131 19.998 17.051 19.987Q16.971 19.976 16.894 19.95Q16.817 19.925 16.746 19.886Q16.676 19.846 16.613 19.795L15.298 18.71Q14.868 18.92 14.414 19.073L14.251 20.774Q14.243 20.854 14.221 20.932Q14.199 21.01 14.162 21.082Q14.126 21.154 14.077 21.219Q14.028 21.283 13.968 21.338Q13.909 21.392 13.84 21.435Q13.771 21.477 13.695 21.506Q13.62 21.535 13.54 21.55Q13.461 21.565 13.38 21.565H10.62Q10.539 21.565 10.46 21.55Q10.38 21.535 10.305 21.506Q10.229 21.477 10.16 21.435Q10.091 21.392 10.032 21.338Q9.972 21.283 9.923 21.219Q9.874 21.154 9.838 21.082Q9.801 21.01 9.779 20.932Q9.757 20.854 9.749 20.774L9.586 19.073Q9.132 18.92 8.702 18.71L7.387 19.795Q7.324 19.846 7.254 19.886Q7.183 19.925 7.106 19.95Q7.029 19.976 6.949 19.987Q6.869 19.998 6.788 19.994Q6.707 19.99 6.629 19.972Q6.55 19.953 6.476 19.92Q6.402 19.887 6.335 19.842Q6.268 19.796 6.211 19.739L4.261 17.789Q4.204 17.732 4.158 17.665Q4.113 17.598 4.08 17.524Q4.047 17.45 4.028 17.371Q4.01 17.293 4.006 17.212Q4.002 17.131 4.013 17.051Q4.024 16.971 4.05 16.894Q4.075 16.817 4.114 16.746Q4.154 16.676 4.205 16.613L5.29 15.298Q5.08 14.868 4.927 14.414L3.226 14.251Q3.146 14.243 3.068 14.221Q2.99 14.199 2.918 14.162Q2.846 14.126 2.781 14.077Q2.717 14.028 2.662 13.968Q2.608 13.909 2.565 13.84Q2.523 13.771 2.494 13.695Q2.465 13.62 2.45 13.54Q2.435 13.461 2.435 13.38V10.62Q2.435 10.539 2.45 10.46Q2.465 10.38 2.494 10.305Q2.523 10.229 2.565 10.16Q2.608 10.091 2.662 10.032Q2.717 9.972 2.781 9.923Q2.846 9.874 2.918 9.838Q2.99 9.801 3.068 9.779Q3.146 9.757 3.226 9.749L4.927 9.586Q5.08 9.132 5.29 8.702L4.205 7.387Q4.154 7.324 4.114 7.254Q4.075 7.183 4.05 7.106Q4.024 7.029 4.013 6.949Q4.002 6.869 4.006 6.788Q4.01 6.707 4.028 6.629Q4.047 6.55 4.08 6.476Q4.113 6.402 4.158 6.335Q4.204 6.268 4.261 6.211L6.211 4.261Q6.268 4.204 6.335 4.158Q6.402 4.113 6.476 4.08Q6.55 4.047 6.629 4.028Q6.707 4.01 6.788 4.006Q6.869 4.002 6.949 4.013Q7.029 4.024 7.106 4.05Q7.183 4.075 7.254 4.114Q7.324 4.154 7.387 4.205L8.702 5.29Q9.132 5.08 9.586 4.927ZM11.271 5.684Q11.258 5.819 11.205 5.944Q11.151 6.069 11.062 6.172Q10.973 6.275 10.858 6.346Q10.742 6.417 10.61 6.449Q9.781 6.654 9.048 7.091Q8.932 7.161 8.8 7.192Q8.669 7.223 8.534 7.212Q8.399 7.202 8.273 7.152Q8.148 7.101 8.043 7.015L6.887 6.061L6.061 6.887L7.015 8.043Q7.101 8.148 7.152 8.273Q7.202 8.399 7.212 8.534Q7.223 8.669 7.192 8.8Q7.161 8.932 7.091 9.048Q6.654 9.781 6.449 10.61Q6.417 10.742 6.346 10.858Q6.275 10.973 6.172 11.062Q6.069 11.151 5.944 11.205Q5.819 11.258 5.684 11.271L4.185 11.415V12.585L5.684 12.729Q5.819 12.742 5.944 12.795Q6.069 12.849 6.172 12.938Q6.275 13.027 6.346 13.142Q6.417 13.258 6.449 13.39Q6.654 14.219 7.091 14.952Q7.161 15.068 7.192 15.2Q7.223 15.331 7.212 15.466Q7.202 15.601 7.152 15.727Q7.101 15.852 7.015 15.957L6.061 17.113L6.887 17.939L8.043 16.985Q8.148 16.899 8.273 16.848Q8.399 16.798 8.534 16.788Q8.669 16.777 8.8 16.808Q8.932 16.839 9.048 16.909Q9.781 17.346 10.61 17.551Q10.742 17.583 10.858 17.654Q10.973 17.725 11.062 17.828Q11.151 17.931 11.205 18.056Q11.258 18.181 11.271 18.316L11.415 19.815H12.585L12.729 18.316Q12.742 18.181 12.795 18.056Q12.849 17.931 12.938 17.828Q13.027 17.725 13.142 17.654Q13.258 17.583 13.39 17.551Q14.219 17.346 14.952 16.909Q15.068 16.839 15.2 16.808Q15.331 16.777 15.466 16.788Q15.601 16.798 15.727 16.848Q15.852 16.899 15.957 16.985L17.113 17.939L17.939 17.113L16.985 15.957Q16.899 15.852 16.848 15.727Q16.798 15.601 16.788 15.466Q16.777 15.331 16.808 15.2Q16.839 15.068 16.909 14.952Q17.346 14.219 17.551 13.39Q17.583 13.258 17.654 13.142Q17.725 13.027 17.828 12.938Q17.931 12.849 18.056 12.795Q18.181 12.742 18.316 12.729L19.815 12.585V11.415L18.316 11.271Q18.181 11.258 18.056 11.205Q17.931 11.151 17.828 11.062Q17.725 10.973 17.654 10.858Q17.583 10.742 17.551 10.61Q17.346 9.781 16.909 9.048Q16.839 8.932 16.808 8.8Q16.777 8.669 16.788 8.534Q16.798 8.399 16.848 8.273Q16.899 8.148 16.985 8.043L17.939 6.887L17.113 6.061L15.957 7.015Q15.852 7.101 15.727 7.152Q15.601 7.202 15.466 7.212Q15.331 7.223 15.2 7.192Q15.068 7.161 14.952 7.091Q14.219 6.654 13.39 6.449Q13.258 6.417 13.142 6.346Q13.027 6.275 12.938 6.172Q12.849 6.069 12.795 5.944Q12.742 5.819 12.729 5.684L12.585 4.185H11.415ZM12 8.325Q12.747 8.325 13.431 8.614Q14.09 8.893 14.599 9.401Q15.107 9.91 15.386 10.569Q15.675 11.253 15.675 12Q15.675 12.747 15.386 13.431Q15.107 14.09 14.599 14.599Q14.09 15.107 13.431 15.386Q12.747 15.675 12 15.675Q11.253 15.675 10.569 15.386Q9.91 15.107 9.401 14.599Q8.893 14.09 8.614 13.431Q8.325 12.747 8.325 12Q8.325 11.253 8.614 10.569Q8.893 9.91 9.401 9.401Q9.91 8.893 10.569 8.614Q11.253 8.325 12 8.325ZM12 10.075Q11.203 10.075 10.639 10.639Q10.075 11.203 10.075 12Q10.075 12.797 10.639 13.361Q11.203 13.925 12 13.925Q12.797 13.925 13.361 13.361Q13.925 12.797 13.925 12Q13.925 11.203 13.361 10.639Q12.797 10.075 12 10.075Z"/></symbol><symbol id="i-notification-bell" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M6 15.5V10C6 6.686 8.686 4 12 4C15.314 4 18 6.686 18 10V15.5L19.5 17.5H4.5Z"/><path fill="currentColor" d="M5.125 15.208V10Q5.125 8.602 5.666 7.324Q6.188 6.09 7.139 5.139Q8.09 4.188 9.324 3.666Q10.196 3.297 11.125 3.179V2.6Q11.125 2.514 11.142 2.429Q11.159 2.345 11.192 2.265Q11.225 2.186 11.272 2.114Q11.32 2.042 11.381 1.981Q11.442 1.92 11.514 1.872Q11.586 1.825 11.665 1.792Q11.745 1.759 11.829 1.742Q11.914 1.725 12 1.725Q12.086 1.725 12.171 1.742Q12.255 1.759 12.335 1.792Q12.414 1.825 12.486 1.872Q12.558 1.92 12.619 1.981Q12.68 2.042 12.728 2.114Q12.775 2.186 12.808 2.265Q12.841 2.345 12.858 2.429Q12.875 2.514 12.875 2.6V3.179Q13.804 3.297 14.676 3.666Q15.91 4.188 16.861 5.139Q17.812 6.09 18.334 7.324Q18.875 8.602 18.875 10V15.208L20.2 16.975Q20.252 17.044 20.289 17.122Q20.326 17.199 20.348 17.283Q20.369 17.366 20.374 17.452Q20.378 17.538 20.366 17.624Q20.354 17.709 20.325 17.79Q20.297 17.872 20.253 17.946Q20.209 18.02 20.151 18.084Q20.094 18.148 20.025 18.2Q19.792 18.375 19.5 18.375H4.5Q4.414 18.375 4.329 18.358Q4.245 18.341 4.165 18.308Q4.086 18.275 4.014 18.228Q3.942 18.18 3.881 18.119Q3.82 18.058 3.772 17.986Q3.725 17.914 3.692 17.835Q3.659 17.755 3.642 17.671Q3.625 17.586 3.625 17.5Q3.625 17.208 3.8 16.975ZM6.875 15.5Q6.875 15.792 6.7 16.025L6.25 16.625H17.75L17.3 16.025Q17.125 15.792 17.125 15.5V10Q17.125 8.957 16.723 8.005Q16.334 7.086 15.624 6.376Q14.914 5.666 13.995 5.277Q13.043 4.875 12 4.875Q10.957 4.875 10.005 5.277Q9.086 5.666 8.376 6.376Q7.666 7.086 7.277 8.005Q6.875 8.957 6.875 10ZM10.875 20Q10.875 20.466 11.205 20.795Q11.534 21.125 12 21.125Q12.466 21.125 12.795 20.795Q13.125 20.466 13.125 20Q13.125 19.914 13.142 19.829Q13.159 19.745 13.192 19.665Q13.225 19.586 13.272 19.514Q13.32 19.442 13.381 19.381Q13.442 19.32 13.514 19.272Q13.586 19.225 13.665 19.192Q13.745 19.159 13.829 19.142Q13.914 19.125 14 19.125Q14.086 19.125 14.171 19.142Q14.255 19.159 14.335 19.192Q14.414 19.225 14.486 19.272Q14.558 19.32 14.619 19.381Q14.68 19.442 14.728 19.514Q14.775 19.586 14.808 19.665Q14.841 19.745 14.858 19.829Q14.875 19.914 14.875 20Q14.875 20.584 14.649 21.119Q14.43 21.635 14.033 22.033Q13.635 22.43 13.119 22.649Q12.584 22.875 12 22.875Q11.416 22.875 10.881 22.649Q10.365 22.43 9.967 22.033Q9.57 21.635 9.351 21.119Q9.125 20.584 9.125 20Q9.125 19.914 9.142 19.829Q9.159 19.745 9.192 19.665Q9.225 19.586 9.272 19.514Q9.32 19.442 9.381 19.381Q9.442 19.32 9.514 19.272Q9.586 19.225 9.665 19.192Q9.745 19.159 9.829 19.142Q9.914 19.125 10 19.125Q10.086 19.125 10.171 19.142Q10.255 19.159 10.335 19.192Q10.414 19.225 10.486 19.272Q10.558 19.32 10.619 19.381Q10.68 19.442 10.728 19.514Q10.775 19.586 10.808 19.665Q10.841 19.745 10.858 19.829Q10.875 19.914 10.875 20Z"/></symbol><symbol id="i-trash-can" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M6.5 7H17.5L16.6 19C16.547 19.844 15.846 20.502 15 20.5H9C8.154 20.502 7.453 19.844 7.4 19Z"/><path fill="currentColor" d="M4.5 6.125H8.625V5.2Q8.625 4.423 9.174 3.874Q9.723 3.325 10.5 3.325H13.5Q14.277 3.325 14.826 3.874Q15.375 4.423 15.375 5.2V6.125H19.5Q19.586 6.125 19.671 6.142Q19.755 6.159 19.835 6.192Q19.914 6.225 19.986 6.272Q20.058 6.32 20.119 6.381Q20.18 6.442 20.228 6.514Q20.275 6.586 20.308 6.665Q20.341 6.745 20.358 6.829Q20.375 6.914 20.375 7Q20.375 7.086 20.358 7.171Q20.341 7.255 20.308 7.335Q20.275 7.414 20.228 7.486Q20.18 7.558 20.119 7.619Q20.058 7.68 19.986 7.728Q19.914 7.775 19.835 7.808Q19.755 7.841 19.671 7.858Q19.586 7.875 19.5 7.875H18.312L17.473 19.055Q17.412 20.034 16.696 20.706Q15.98 21.377 15 21.375L9.002 21.375Q8.02 21.377 7.304 20.706Q6.588 20.034 6.527 19.065L5.688 7.875H4.5Q4.414 7.875 4.329 7.858Q4.245 7.841 4.165 7.808Q4.086 7.775 4.014 7.728Q3.942 7.68 3.881 7.619Q3.82 7.558 3.772 7.486Q3.725 7.414 3.692 7.335Q3.659 7.255 3.642 7.171Q3.625 7.086 3.625 7Q3.625 6.914 3.642 6.829Q3.659 6.745 3.692 6.665Q3.725 6.586 3.772 6.514Q3.82 6.442 3.881 6.381Q3.942 6.32 4.014 6.272Q4.086 6.225 4.165 6.192Q4.245 6.159 4.329 6.142Q4.414 6.125 4.5 6.125ZM7.443 7.875 8.273 18.935Q8.291 19.232 8.501 19.429Q8.711 19.626 8.998 19.625L15 19.625Q15.289 19.626 15.499 19.429Q15.709 19.232 15.727 18.945L16.557 7.875ZM11.075 10.5V17Q11.075 17.086 11.058 17.171Q11.041 17.255 11.008 17.335Q10.975 17.414 10.928 17.486Q10.88 17.558 10.819 17.619Q10.758 17.68 10.686 17.728Q10.614 17.775 10.535 17.808Q10.455 17.841 10.371 17.858Q10.286 17.875 10.2 17.875Q10.114 17.875 10.029 17.858Q9.945 17.841 9.865 17.808Q9.786 17.775 9.714 17.728Q9.642 17.68 9.581 17.619Q9.52 17.558 9.472 17.486Q9.425 17.414 9.392 17.335Q9.359 17.255 9.342 17.171Q9.325 17.086 9.325 17V10.5Q9.325 10.414 9.342 10.329Q9.359 10.245 9.392 10.165Q9.425 10.086 9.472 10.014Q9.52 9.942 9.581 9.881Q9.642 9.82 9.714 9.772Q9.786 9.725 9.865 9.692Q9.945 9.659 10.029 9.642Q10.114 9.625 10.2 9.625Q10.286 9.625 10.371 9.642Q10.455 9.659 10.535 9.692Q10.614 9.725 10.686 9.772Q10.758 9.82 10.819 9.881Q10.88 9.942 10.928 10.014Q10.975 10.086 11.008 10.165Q11.041 10.245 11.058 10.329Q11.075 10.414 11.075 10.5ZM14.675 10.5V17Q14.675 17.086 14.658 17.171Q14.641 17.255 14.608 17.335Q14.575 17.414 14.528 17.486Q14.48 17.558 14.419 17.619Q14.358 17.68 14.286 17.728Q14.214 17.775 14.135 17.808Q14.055 17.841 13.971 17.858Q13.886 17.875 13.8 17.875Q13.714 17.875 13.629 17.858Q13.545 17.841 13.465 17.808Q13.386 17.775 13.314 17.728Q13.242 17.68 13.181 17.619Q13.12 17.558 13.072 17.486Q13.025 17.414 12.992 17.335Q12.959 17.255 12.942 17.171Q12.925 17.086 12.925 17V10.5Q12.925 10.414 12.942 10.329Q12.959 10.245 12.992 10.165Q13.025 10.086 13.072 10.014Q13.12 9.942 13.181 9.881Q13.242 9.82 13.314 9.772Q13.386 9.725 13.465 9.692Q13.545 9.659 13.629 9.642Q13.714 9.625 13.8 9.625Q13.886 9.625 13.971 9.642Q14.055 9.659 14.135 9.692Q14.214 9.725 14.286 9.772Q14.358 9.82 14.419 9.881Q14.48 9.942 14.528 10.014Q14.575 10.086 14.608 10.165Q14.641 10.245 14.658 10.329Q14.675 10.414 14.675 10.5ZM10.375 6.125H13.625V5.2Q13.625 5.075 13.5 5.075H10.5Q10.375 5.075 10.375 5.2V6.125Z"/></symbol><symbol id="i-person" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M5 20.5C5 16.634 8.134 13.5 12 13.5C15.866 13.5 19 16.634 19 20.5H5Z"/><path fill="currentColor" d="M4.125 20.5Q4.125 18.898 4.744 17.434Q5.342 16.021 6.432 14.932Q7.521 13.842 8.934 13.244Q10.398 12.625 12 12.625Q13.602 12.625 15.066 13.244Q16.479 13.842 17.568 14.932Q18.658 16.021 19.256 17.434Q19.875 18.898 19.875 20.5Q19.875 20.586 19.858 20.671Q19.841 20.755 19.808 20.835Q19.775 20.914 19.728 20.986Q19.68 21.058 19.619 21.119Q19.558 21.18 19.486 21.228Q19.414 21.275 19.335 21.308Q19.255 21.341 19.171 21.358Q19.086 21.375 19 21.375H5Q4.914 21.375 4.829 21.358Q4.745 21.341 4.665 21.308Q4.586 21.275 4.514 21.228Q4.442 21.18 4.381 21.119Q4.32 21.058 4.272 20.986Q4.225 20.914 4.192 20.835Q4.159 20.755 4.142 20.671Q4.125 20.586 4.125 20.5ZM16.375 7.5Q16.375 8.39 16.031 9.203Q15.699 9.988 15.094 10.594Q14.488 11.199 13.703 11.531Q12.89 11.875 12 11.875Q11.11 11.875 10.297 11.531Q9.512 11.199 8.906 10.594Q8.301 9.988 7.969 9.203Q7.625 8.39 7.625 7.5Q7.625 6.61 7.969 5.797Q8.301 5.012 8.906 4.406Q9.512 3.801 10.297 3.469Q11.11 3.125 12 3.125Q12.89 3.125 13.703 3.469Q14.488 3.801 15.094 4.406Q15.699 5.012 16.031 5.797Q16.375 6.61 16.375 7.5ZM5.936 19.625H18.064Q17.954 18.848 17.644 18.116Q17.179 17.017 16.331 16.169Q15.483 15.321 14.384 14.856Q13.247 14.375 12 14.375Q10.753 14.375 9.616 14.856Q8.517 15.321 7.669 16.169Q6.821 17.017 6.356 18.116Q6.046 18.848 5.936 19.625ZM14.625 7.5Q14.625 6.413 13.856 5.644Q13.087 4.875 12 4.875Q10.913 4.875 10.144 5.644Q9.375 6.413 9.375 7.5Q9.375 8.587 10.144 9.356Q10.913 10.125 12 10.125Q13.087 10.125 13.856 9.356Q14.625 8.587 14.625 7.5Z"/></symbol><symbol id="i-checkmark" viewBox="0 0 24 24"><path fill="currentColor" d="M5.119 11.781 9.29 15.953 17.871 7.091Q17.931 7.029 18.002 6.98Q18.073 6.931 18.152 6.897Q18.231 6.863 18.316 6.845Q18.4 6.826 18.486 6.825Q18.572 6.824 18.657 6.839Q18.742 6.855 18.822 6.886Q18.902 6.918 18.974 6.965Q19.047 7.011 19.109 7.071Q19.171 7.131 19.22 7.202Q19.269 7.273 19.303 7.352Q19.337 7.431 19.355 7.516Q19.374 7.6 19.375 7.686Q19.376 7.772 19.361 7.857Q19.345 7.942 19.314 8.022Q19.282 8.102 19.235 8.174Q19.189 8.247 19.129 8.309L9.929 17.809Q9.924 17.814 9.919 17.819Q9.858 17.88 9.786 17.928Q9.714 17.975 9.635 18.008Q9.555 18.041 9.471 18.058Q9.386 18.075 9.3 18.075Q9.214 18.075 9.129 18.058Q9.045 18.041 8.965 18.008Q8.886 17.975 8.814 17.928Q8.742 17.88 8.681 17.819L3.881 13.019Q3.82 12.958 3.772 12.886Q3.725 12.814 3.692 12.735Q3.659 12.655 3.642 12.571Q3.625 12.486 3.625 12.4Q3.625 12.314 3.642 12.229Q3.659 12.145 3.692 12.065Q3.725 11.986 3.772 11.914Q3.82 11.842 3.881 11.781Q3.942 11.72 4.014 11.672Q4.086 11.625 4.165 11.592Q4.245 11.559 4.329 11.542Q4.414 11.525 4.5 11.525Q4.586 11.525 4.671 11.542Q4.755 11.559 4.835 11.592Q4.914 11.625 4.986 11.672Q5.058 11.72 5.119 11.781Z"/></symbol><symbol id="i-heart" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M12 20.5C12 20.5 3.5 15.4 3.5 9.4C3.5 6.6 5.6 4.5 8.2 4.5C9.8 4.5 11.2 5.3 12 6.6C12.8 5.3 14.2 4.5 15.8 4.5C18.4 4.5 20.5 6.6 20.5 9.4C20.5 15.4 12 20.5 12 20.5Z"/><path fill="currentColor" d="M11.55 21.25Q10.988 20.913 10.162 20.32Q8.519 19.141 7.146 17.833Q5.202 15.981 4.079 14.117Q2.625 11.706 2.625 9.4Q2.625 8.201 3.057 7.127Q3.476 6.084 4.247 5.29Q5.016 4.499 6.025 4.067Q7.059 3.625 8.2 3.625Q9.619 3.625 10.826 4.298Q11.485 4.665 12 5.188Q12.515 4.665 13.174 4.298Q14.381 3.625 15.8 3.625Q16.941 3.625 17.975 4.067Q18.984 4.499 19.753 5.29Q20.524 6.084 20.943 7.127Q21.375 8.201 21.375 9.4Q21.375 11.706 19.921 14.117Q18.798 15.981 16.854 17.833Q15.481 19.141 13.838 20.32Q13.012 20.913 12.45 21.25Q12.348 21.312 12.234 21.343Q12.119 21.375 12 21.375Q11.881 21.375 11.766 21.343Q11.652 21.312 11.55 21.25ZM12 19.465Q12.362 19.226 12.818 18.898Q14.362 17.79 15.646 16.567Q17.421 14.876 18.423 13.214Q19.625 11.219 19.625 9.4Q19.625 8.539 19.319 7.78Q19.029 7.057 18.497 6.51Q17.973 5.97 17.287 5.676Q16.583 5.375 15.8 5.375Q14.836 5.375 14.026 5.827Q13.23 6.271 12.745 7.059Q12.636 7.236 12.459 7.345Q12.385 7.39 12.304 7.42Q12.224 7.45 12.139 7.464Q12.053 7.478 11.967 7.474Q11.881 7.471 11.797 7.451Q11.713 7.431 11.635 7.395Q11.557 7.359 11.487 7.309Q11.417 7.258 11.359 7.195Q11.3 7.132 11.255 7.059Q10.77 6.271 9.974 5.827Q9.164 5.375 8.2 5.375Q7.417 5.375 6.713 5.676Q6.027 5.97 5.503 6.51Q4.971 7.057 4.681 7.78Q4.375 8.539 4.375 9.4Q4.375 11.219 5.577 13.214Q6.579 14.876 8.354 16.567Q9.638 17.79 11.182 18.898Q11.638 19.226 12 19.465Z"/></symbol><symbol id="i-flame" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M12 3C13.5 5 15 8 14 11Q16 11 16 8C21 13 18.5 21 12 21C5.5 21 3 14 6.5 9Q6.5 11 8.5 12C8.25 10 9.25 8.75 10.25 7.5C11.25 6.25 12.25 5 12 3Z"/><path fill="currentColor" d="M12.7 2.475Q14.151 4.409 14.771 6.36Q15.024 7.155 15.128 7.923Q15.133 7.876 15.142 7.829Q15.159 7.745 15.192 7.665Q15.225 7.586 15.272 7.514Q15.32 7.442 15.381 7.381Q15.442 7.32 15.514 7.272Q15.586 7.225 15.665 7.192Q15.745 7.159 15.829 7.142Q15.914 7.125 16 7.125Q16.174 7.125 16.335 7.192Q16.496 7.258 16.619 7.381Q18.599 9.361 19.247 11.926Q19.857 14.343 19.148 16.634Q18.431 18.952 16.606 20.364Q14.653 21.875 12 21.875Q9.385 21.875 7.418 20.555Q5.58 19.32 4.694 17.215Q3.836 15.178 4.099 12.884Q4.372 10.514 5.783 8.498Q5.833 8.428 5.895 8.368Q5.957 8.308 6.03 8.262Q6.102 8.216 6.183 8.185Q6.263 8.153 6.348 8.138Q6.433 8.123 6.519 8.125Q6.605 8.127 6.689 8.146Q6.773 8.164 6.852 8.199Q6.931 8.234 7.002 8.283Q7.088 8.344 7.158 8.423Q7.227 8.502 7.276 8.596Q7.325 8.69 7.35 8.792Q7.375 8.894 7.375 9Q7.375 9.721 7.715 10.244Q7.847 9.655 8.117 9.091Q8.379 8.544 8.806 7.942Q9.051 7.598 9.567 6.953Q10.051 6.348 10.267 6.044Q10.608 5.565 10.804 5.154Q11.267 4.187 11.132 3.109Q11.121 3.023 11.127 2.937Q11.133 2.851 11.156 2.768Q11.179 2.685 11.218 2.608Q11.256 2.531 11.309 2.463Q11.362 2.395 11.427 2.338Q11.493 2.282 11.567 2.239Q11.642 2.197 11.724 2.17Q11.806 2.142 11.891 2.132Q12.006 2.117 12.121 2.133Q12.235 2.149 12.342 2.195Q12.448 2.24 12.54 2.311Q12.631 2.382 12.7 2.475ZM12.549 5.528Q12.474 5.72 12.383 5.909Q12.121 6.456 11.694 7.058Q11.449 7.402 10.933 8.047Q10.449 8.652 10.233 8.956Q9.892 9.435 9.696 9.846Q9.233 10.813 9.368 11.891Q9.401 12.154 9.283 12.391Q9.244 12.468 9.191 12.536Q9.138 12.605 9.073 12.661Q9.008 12.717 8.933 12.76Q8.858 12.803 8.777 12.83Q8.695 12.857 8.609 12.868Q8.524 12.879 8.438 12.873Q8.352 12.867 8.269 12.844Q8.186 12.821 8.109 12.783Q6.911 12.184 6.283 11.252Q5.947 12.134 5.838 13.084Q5.627 14.921 6.306 16.535Q6.99 18.159 8.394 19.102Q9.918 20.125 12 20.125Q14.055 20.125 15.535 18.98Q16.923 17.906 17.477 16.116Q18.04 14.295 17.55 12.355Q17.242 11.137 16.561 10.074Q16.424 10.441 16.228 10.735Q15.468 11.875 14 11.875Q13.858 11.875 13.723 11.83Q13.642 11.803 13.567 11.76Q13.492 11.717 13.427 11.661Q13.362 11.605 13.309 11.536Q13.256 11.468 13.217 11.391Q13.179 11.314 13.156 11.231Q13.133 11.148 13.127 11.062Q13.121 10.976 13.132 10.891Q13.143 10.805 13.17 10.723Q13.76 8.953 13.104 6.89Q12.888 6.211 12.549 5.528ZM12.849 11.788Q12.953 12.205 13.268 12.67Q13.479 12.983 14.004 13.594Q14.389 14.044 14.57 14.28Q14.895 14.703 15.086 15.079Q15.62 16.127 15.349 17.212Q15.078 18.297 14.001 18.891Q13.124 19.375 12 19.375Q10.876 19.375 9.999 18.891Q8.922 18.297 8.651 17.212Q8.358 16.04 8.891 14.93Q9.088 14.519 9.43 14.053Q9.622 13.791 10.041 13.282Q10.481 12.746 10.687 12.465Q11.014 12.015 11.217 11.609Q11.256 11.532 11.309 11.464Q11.362 11.395 11.427 11.339Q11.492 11.283 11.567 11.24Q11.642 11.197 11.723 11.17Q11.805 11.143 11.891 11.132Q11.976 11.121 12.062 11.127Q12.148 11.133 12.231 11.156Q12.314 11.179 12.391 11.217Q12.563 11.303 12.683 11.452Q12.802 11.602 12.849 11.788ZM11.897 13.765Q11.693 14.028 11.392 14.394Q10.665 15.278 10.469 15.687Q10.209 16.228 10.349 16.788Q10.435 17.133 10.845 17.359Q11.327 17.625 12 17.625Q12.673 17.625 13.155 17.359Q13.565 17.133 13.651 16.788Q13.764 16.338 13.527 15.874Q13.342 15.51 12.676 14.734Q12.167 14.141 11.897 13.765Z"/></symbol><symbol id="i-play" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M9.8 8.4Q9.8 7.8 10.4 8.1L15.9 11.4Q16.8 12 15.9 12.6L10.4 15.9Q9.8 16.2 9.8 15.6V8.4Z"/><path fill="currentColor" d="M21.875 12Q21.875 14.008 21.099 15.844Q20.349 17.616 18.983 18.983Q17.616 20.349 15.844 21.099Q14.008 21.875 12 21.875Q9.992 21.875 8.156 21.099Q6.384 20.349 5.017 18.983Q3.651 17.616 2.901 15.844Q2.125 14.008 2.125 12Q2.125 9.992 2.901 8.156Q3.651 6.384 5.017 5.017Q6.384 3.651 8.156 2.901Q9.992 2.125 12 2.125Q14.008 2.125 15.844 2.901Q17.616 3.651 18.983 5.017Q20.349 6.384 21.099 8.156Q21.875 9.992 21.875 12ZM20.125 12Q20.125 10.346 19.487 8.838Q18.87 7.38 17.745 6.255Q16.62 5.13 15.162 4.513Q13.654 3.875 12 3.875Q10.346 3.875 8.838 4.513Q7.38 5.13 6.255 6.255Q5.13 7.38 4.513 8.838Q3.875 10.346 3.875 12Q3.875 13.654 4.513 15.162Q5.13 16.62 6.255 17.745Q7.38 18.87 8.838 19.487Q10.346 20.125 12 20.125Q13.654 20.125 15.162 19.487Q16.62 18.87 17.745 17.745Q18.87 16.62 19.487 15.162Q20.125 13.654 20.125 12ZM8.925 8.4Q8.925 8.081 9.025 7.831Q9.186 7.429 9.559 7.242Q10.1 6.972 10.791 7.317Q10.821 7.332 10.85 7.35L16.35 10.65Q16.368 10.66 16.385 10.672Q17.225 11.232 17.225 12Q17.225 12.768 16.385 13.328Q16.368 13.34 16.35 13.35L10.85 16.65Q10.821 16.668 10.791 16.683Q10.1 17.028 9.559 16.758Q9.186 16.571 9.025 16.169Q8.925 15.919 8.925 15.6ZM10.675 9.285V14.715L15.199 12Z"/></symbol><symbol id="i-bar-chart" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M5 10.25H19C19.552 10.25 20 10.698 20 11.25V12.75C20 13.302 19.552 13.75 19 13.75H5C4.448 13.75 4 13.302 4 12.75V11.25C4 10.698 4.448 10.25 5 10.25Z"/><path fill="currentColor" d="M5 9.375H19Q19.777 9.375 20.326 9.924Q20.875 10.473 20.875 11.25V12.75Q20.875 13.527 20.326 14.076Q19.777 14.625 19 14.625H5Q4.223 14.625 3.674 14.076Q3.125 13.527 3.125 12.75V11.25Q3.125 10.473 3.674 9.924Q4.223 9.375 5 9.375ZM5 2.625H13Q13.777 2.625 14.326 3.174Q14.875 3.723 14.875 4.5V6Q14.875 6.777 14.326 7.326Q13.777 7.875 13 7.875H5Q4.223 7.875 3.674 7.326Q3.125 6.777 3.125 6V4.5Q3.125 3.723 3.674 3.174Q4.223 2.625 5 2.625ZM5 16.125H9Q9.777 16.125 10.326 16.674Q10.875 17.223 10.875 18V19.5Q10.875 20.277 10.326 20.826Q9.777 21.375 9 21.375H5Q4.223 21.375 3.674 20.826Q3.125 20.277 3.125 19.5V18Q3.125 17.223 3.674 16.674Q4.223 16.125 5 16.125ZM5 11.125Q4.875 11.125 4.875 11.25V12.75Q4.875 12.875 5 12.875H19Q19.125 12.875 19.125 12.75V11.25Q19.125 11.125 19 11.125ZM5 4.375Q4.875 4.375 4.875 4.5V6Q4.875 6.125 5 6.125H13Q13.125 6.125 13.125 6V4.5Q13.125 4.375 13 4.375ZM5 17.875Q4.875 17.875 4.875 18V19.5Q4.875 19.625 5 19.625H9Q9.125 19.625 9.125 19.5V18Q9.125 17.875 9 17.875Z"/></symbol><symbol id="i-calendar" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M4 10V7.5C4 6.395 4.895 5.5 6 5.5H18C19.105 5.5 20 6.395 20 7.5V10H4Z"/><path fill="currentColor" d="M6 4.625H7.625V3.3Q7.625 3.214 7.642 3.129Q7.659 3.045 7.692 2.965Q7.725 2.886 7.772 2.814Q7.82 2.742 7.881 2.681Q7.942 2.62 8.014 2.572Q8.086 2.525 8.165 2.492Q8.245 2.459 8.329 2.442Q8.414 2.425 8.5 2.425Q8.586 2.425 8.671 2.442Q8.755 2.459 8.835 2.492Q8.914 2.525 8.986 2.572Q9.058 2.62 9.119 2.681Q9.18 2.742 9.228 2.814Q9.275 2.886 9.308 2.965Q9.341 3.045 9.358 3.129Q9.375 3.214 9.375 3.3V4.625H14.625V3.3Q14.625 3.214 14.642 3.129Q14.659 3.045 14.692 2.965Q14.725 2.886 14.772 2.814Q14.82 2.742 14.881 2.681Q14.942 2.62 15.014 2.572Q15.086 2.525 15.165 2.492Q15.245 2.459 15.329 2.442Q15.414 2.425 15.5 2.425Q15.586 2.425 15.671 2.442Q15.755 2.459 15.835 2.492Q15.914 2.525 15.986 2.572Q16.058 2.62 16.119 2.681Q16.18 2.742 16.228 2.814Q16.275 2.886 16.308 2.965Q16.341 3.045 16.358 3.129Q16.375 3.214 16.375 3.3V4.625H18Q18.584 4.625 19.119 4.851Q19.635 5.07 20.033 5.467Q20.43 5.865 20.649 6.381Q20.875 6.916 20.875 7.5V18.5Q20.875 19.084 20.649 19.619Q20.43 20.135 20.033 20.533Q19.635 20.93 19.119 21.149Q18.584 21.375 18 21.375H6Q5.416 21.375 4.881 21.149Q4.365 20.93 3.967 20.533Q3.57 20.135 3.351 19.619Q3.125 19.084 3.125 18.5V7.5Q3.125 6.916 3.351 6.381Q3.57 5.865 3.967 5.467Q4.365 5.07 4.881 4.851Q5.416 4.625 6 4.625ZM4.875 10.875V18.5Q4.875 18.966 5.205 19.295Q5.534 19.625 6 19.625H18Q18.466 19.625 18.795 19.295Q19.125 18.966 19.125 18.5V10.875ZM6 6.375Q5.534 6.375 5.205 6.705Q4.875 7.034 4.875 7.5V9.125H19.125V7.5Q19.125 7.034 18.795 6.705Q18.466 6.375 18 6.375H16.375V7.3Q16.375 7.386 16.358 7.471Q16.341 7.555 16.308 7.635Q16.275 7.714 16.228 7.786Q16.18 7.858 16.119 7.919Q16.058 7.98 15.986 8.028Q15.914 8.075 15.835 8.108Q15.755 8.141 15.671 8.158Q15.586 8.175 15.5 8.175Q15.414 8.175 15.329 8.158Q15.245 8.141 15.165 8.108Q15.086 8.075 15.014 8.028Q14.942 7.98 14.881 7.919Q14.82 7.858 14.772 7.786Q14.725 7.714 14.692 7.635Q14.659 7.555 14.642 7.471Q14.625 7.386 14.625 7.3V6.375H9.375V7.3Q9.375 7.386 9.358 7.471Q9.341 7.555 9.308 7.635Q9.275 7.714 9.228 7.786Q9.18 7.858 9.119 7.919Q9.058 7.98 8.986 8.028Q8.914 8.075 8.835 8.108Q8.755 8.141 8.671 8.158Q8.586 8.175 8.5 8.175Q8.414 8.175 8.329 8.158Q8.245 8.141 8.165 8.108Q8.086 8.075 8.014 8.028Q7.942 7.98 7.881 7.919Q7.82 7.858 7.772 7.786Q7.725 7.714 7.692 7.635Q7.659 7.555 7.642 7.471Q7.625 7.386 7.625 7.3V6.375ZM13.9 13.2H15.7C16.197 13.2 16.6 13.603 16.6 14.1V15.9C16.6 16.397 16.197 16.8 15.7 16.8H13.9C13.403 16.8 13 16.397 13 15.9V14.1C13 13.603 13.403 13.2 13.9 13.2Z"/></symbol><symbol id="i-wristwatch" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M18 12C18 15.314 15.314 18 12 18C8.686 18 6 15.314 6 12C6 8.686 8.686 6 12 6C15.314 6 18 8.686 18 12Z"/><path fill="currentColor" d="M18.875 12Q18.875 13.398 18.334 14.676Q17.812 15.91 16.861 16.861Q16.401 17.321 15.875 17.681V21.5Q15.875 21.586 15.858 21.671Q15.841 21.755 15.808 21.835Q15.775 21.914 15.728 21.986Q15.68 22.058 15.619 22.119Q15.558 22.18 15.486 22.228Q15.414 22.275 15.335 22.308Q15.255 22.341 15.171 22.358Q15.086 22.375 15 22.375H9Q8.914 22.375 8.829 22.358Q8.745 22.341 8.665 22.308Q8.586 22.275 8.514 22.228Q8.442 22.18 8.381 22.119Q8.32 22.058 8.272 21.986Q8.225 21.914 8.192 21.835Q8.159 21.755 8.142 21.671Q8.125 21.586 8.125 21.5V17.681Q7.599 17.321 7.139 16.861Q6.188 15.91 5.666 14.676Q5.125 13.398 5.125 12Q5.125 10.602 5.666 9.324Q6.188 8.09 7.139 7.139Q7.599 6.679 8.125 6.319V2.5Q8.125 2.414 8.142 2.329Q8.159 2.245 8.192 2.165Q8.225 2.086 8.272 2.014Q8.32 1.942 8.381 1.881Q8.442 1.82 8.514 1.772Q8.586 1.725 8.665 1.692Q8.745 1.659 8.829 1.642Q8.914 1.625 9 1.625H15Q15.086 1.625 15.171 1.642Q15.255 1.659 15.335 1.692Q15.414 1.725 15.486 1.772Q15.558 1.82 15.619 1.881Q15.68 1.942 15.728 2.014Q15.775 2.086 15.808 2.165Q15.841 2.245 15.858 2.329Q15.875 2.414 15.875 2.5V6.319Q16.401 6.679 16.861 7.139Q17.812 8.09 18.334 9.324Q18.875 10.602 18.875 12ZM17.125 12Q17.125 10.957 16.723 10.005Q16.334 9.086 15.624 8.376Q14.914 7.666 13.995 7.277Q13.043 6.875 12 6.875Q10.957 6.875 10.005 7.277Q9.086 7.666 8.376 8.376Q7.666 9.086 7.277 10.005Q6.875 10.957 6.875 12Q6.875 13.043 7.277 13.995Q7.666 14.914 8.376 15.624Q9.086 16.334 10.005 16.723Q10.957 17.125 12 17.125Q13.043 17.125 13.995 16.723Q14.914 16.334 15.624 15.624Q16.334 14.914 16.723 13.995Q17.125 13.043 17.125 12ZM12.875 8.5V11.505L14.95 12.75Q15.024 12.794 15.088 12.852Q15.152 12.91 15.203 12.979Q15.254 13.048 15.291 13.126Q15.328 13.204 15.349 13.288Q15.37 13.371 15.374 13.457Q15.378 13.544 15.365 13.629Q15.353 13.714 15.324 13.795Q15.295 13.876 15.25 13.95Q15.206 14.024 15.148 14.088Q15.09 14.152 15.021 14.203Q14.952 14.254 14.874 14.291Q14.796 14.328 14.712 14.349Q14.629 14.37 14.543 14.374Q14.456 14.378 14.371 14.365Q14.286 14.353 14.205 14.324Q14.124 14.295 14.05 14.25L11.55 12.75Q11.453 12.692 11.374 12.611Q11.294 12.53 11.239 12.431Q11.183 12.332 11.154 12.223Q11.125 12.113 11.125 12V8.5Q11.125 8.414 11.142 8.329Q11.159 8.245 11.192 8.165Q11.225 8.086 11.272 8.014Q11.32 7.942 11.381 7.881Q11.442 7.82 11.514 7.772Q11.586 7.725 11.665 7.692Q11.745 7.659 11.829 7.642Q11.914 7.625 12 7.625Q12.086 7.625 12.171 7.642Q12.255 7.659 12.335 7.692Q12.414 7.725 12.486 7.772Q12.558 7.82 12.619 7.881Q12.68 7.942 12.728 8.014Q12.775 8.086 12.808 8.165Q12.841 8.245 12.858 8.329Q12.875 8.414 12.875 8.5ZM9.875 5.459Q10.9 5.125 12 5.125Q13.1 5.125 14.125 5.459V3.375H9.875ZM9.875 18.541V20.625H14.125V18.541Q13.1 18.875 12 18.875Q10.9 18.875 9.875 18.541Z"/></symbol><symbol id="i-speaker-volume" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M3 9H7L12 5V19L7 15H3Z"/><path fill="currentColor" d="M3 8.125H6.693L11.453 4.317Q11.521 4.263 11.597 4.223Q11.674 4.184 11.756 4.16Q11.839 4.136 11.925 4.128Q12.011 4.121 12.097 4.13Q12.182 4.14 12.264 4.166Q12.347 4.192 12.422 4.234Q12.498 4.275 12.563 4.331Q12.629 4.386 12.683 4.453Q12.875 4.693 12.875 5V19Q12.875 19.086 12.858 19.171Q12.841 19.255 12.808 19.335Q12.775 19.414 12.728 19.486Q12.68 19.558 12.619 19.619Q12.558 19.68 12.486 19.728Q12.414 19.775 12.335 19.808Q12.255 19.841 12.171 19.858Q12.086 19.875 12 19.875Q11.693 19.875 11.453 19.683L6.693 15.875H3Q2.914 15.875 2.829 15.858Q2.745 15.841 2.665 15.808Q2.586 15.775 2.514 15.728Q2.442 15.68 2.381 15.619Q2.32 15.558 2.272 15.486Q2.225 15.414 2.192 15.335Q2.159 15.255 2.142 15.171Q2.125 15.086 2.125 15V9Q2.125 8.914 2.142 8.829Q2.159 8.745 2.192 8.665Q2.225 8.586 2.272 8.514Q2.32 8.442 2.381 8.381Q2.442 8.32 2.514 8.272Q2.586 8.225 2.665 8.192Q2.745 8.159 2.829 8.142Q2.914 8.125 3 8.125ZM3.875 9.875V14.125H7Q7.307 14.125 7.547 14.317L11.125 17.179V6.821L7.547 9.683Q7.307 9.875 7 9.875ZM19.025 4.8Q20.665 6.03 21.55 8.02Q22.375 9.877 22.375 12Q22.375 14.123 21.55 15.98Q20.665 17.97 19.025 19.2Q18.956 19.252 18.878 19.289Q18.801 19.326 18.717 19.348Q18.634 19.369 18.548 19.374Q18.462 19.378 18.376 19.366Q18.291 19.354 18.21 19.325Q18.128 19.297 18.054 19.253Q17.98 19.209 17.916 19.151Q17.852 19.094 17.8 19.025Q17.748 18.956 17.711 18.878Q17.674 18.801 17.652 18.717Q17.631 18.634 17.626 18.548Q17.622 18.462 17.634 18.376Q17.646 18.291 17.675 18.21Q17.703 18.128 17.747 18.054Q17.791 17.98 17.849 17.916Q17.906 17.852 17.975 17.8Q19.251 16.843 19.95 15.27Q20.625 13.752 20.625 12Q20.625 10.248 19.95 8.73Q19.251 7.157 17.975 6.2Q17.906 6.148 17.849 6.084Q17.791 6.02 17.747 5.946Q17.703 5.872 17.675 5.79Q17.646 5.709 17.634 5.624Q17.622 5.538 17.626 5.452Q17.631 5.366 17.652 5.283Q17.674 5.199 17.711 5.122Q17.748 5.044 17.8 4.975Q17.852 4.906 17.916 4.849Q17.98 4.791 18.054 4.747Q18.128 4.703 18.21 4.675Q18.291 4.646 18.376 4.634Q18.462 4.622 18.548 4.626Q18.634 4.631 18.717 4.652Q18.801 4.674 18.878 4.711Q18.956 4.748 19.025 4.8ZM16.025 8.3Q16.927 8.976 17.412 9.978Q17.875 10.932 17.875 12Q17.875 13.068 17.412 14.022Q16.927 15.024 16.025 15.7Q15.956 15.752 15.878 15.789Q15.801 15.826 15.717 15.848Q15.634 15.869 15.548 15.874Q15.462 15.878 15.376 15.866Q15.291 15.854 15.21 15.825Q15.128 15.797 15.054 15.753Q14.98 15.709 14.916 15.651Q14.852 15.594 14.8 15.525Q14.748 15.456 14.711 15.378Q14.674 15.301 14.652 15.217Q14.631 15.134 14.626 15.048Q14.622 14.962 14.634 14.876Q14.646 14.791 14.675 14.71Q14.703 14.628 14.747 14.554Q14.791 14.48 14.849 14.416Q14.906 14.352 14.975 14.3Q15.537 13.878 15.838 13.259Q16.125 12.666 16.125 12Q16.125 11.334 15.838 10.741Q15.537 10.122 14.975 9.7Q14.906 9.648 14.849 9.584Q14.791 9.52 14.747 9.446Q14.703 9.372 14.675 9.29Q14.646 9.209 14.634 9.124Q14.622 9.038 14.626 8.952Q14.631 8.866 14.652 8.783Q14.674 8.699 14.711 8.622Q14.748 8.544 14.8 8.475Q14.852 8.406 14.916 8.349Q14.98 8.291 15.054 8.247Q15.128 8.203 15.21 8.175Q15.291 8.146 15.376 8.134Q15.462 8.122 15.548 8.126Q15.634 8.131 15.717 8.152Q15.801 8.174 15.878 8.211Q15.956 8.248 16.025 8.3Z"/></symbol><symbol id="i-home" viewBox="0 0 24 24"><path fill="var(--icon-accent)" d="M6 9.6 12 4.8 18 9.6V20H14V15H10V20H6Z"/><path fill="currentColor" d="M2.953 10.317 11.453 3.517Q11.511 3.471 11.576 3.435Q11.641 3.399 11.71 3.374Q11.78 3.35 11.853 3.337Q11.926 3.325 12 3.325Q12.074 3.325 12.147 3.337Q12.22 3.35 12.29 3.374Q12.359 3.399 12.424 3.435Q12.489 3.471 12.547 3.517L21.047 10.317Q21.114 10.371 21.169 10.437Q21.225 10.502 21.266 10.578Q21.308 10.653 21.334 10.736Q21.36 10.818 21.37 10.903Q21.379 10.989 21.372 11.075Q21.364 11.161 21.34 11.244Q21.316 11.326 21.277 11.403Q21.237 11.479 21.183 11.547Q21.129 11.614 21.063 11.669Q20.998 11.725 20.922 11.766Q20.847 11.808 20.764 11.834Q20.682 11.86 20.597 11.87Q20.511 11.879 20.425 11.872Q20.339 11.864 20.256 11.84Q20.174 11.816 20.097 11.777Q20.021 11.737 19.953 11.683L18.875 10.821V20Q18.875 20.086 18.858 20.171Q18.841 20.255 18.808 20.335Q18.775 20.414 18.728 20.486Q18.68 20.558 18.619 20.619Q18.558 20.68 18.486 20.728Q18.414 20.775 18.335 20.808Q18.255 20.841 18.171 20.858Q18.086 20.875 18 20.875H6Q5.914 20.875 5.829 20.858Q5.745 20.841 5.665 20.808Q5.586 20.775 5.514 20.728Q5.442 20.68 5.381 20.619Q5.32 20.558 5.272 20.486Q5.225 20.414 5.192 20.335Q5.159 20.255 5.142 20.171Q5.125 20.086 5.125 20V10.821L4.047 11.683Q3.979 11.737 3.903 11.777Q3.826 11.816 3.744 11.84Q3.661 11.864 3.575 11.872Q3.489 11.879 3.403 11.87Q3.318 11.86 3.236 11.834Q3.153 11.808 3.078 11.766Q3.002 11.725 2.937 11.669Q2.871 11.614 2.817 11.547Q2.763 11.479 2.723 11.403Q2.684 11.326 2.66 11.244Q2.636 11.161 2.628 11.075Q2.621 10.989 2.63 10.903Q2.64 10.818 2.666 10.736Q2.692 10.653 2.734 10.578Q2.775 10.502 2.831 10.437Q2.886 10.371 2.953 10.317ZM17.125 9.421 12 5.321 6.875 9.421V19.125H9.125V15Q9.125 14.914 9.142 14.829Q9.159 14.745 9.192 14.665Q9.225 14.586 9.272 14.514Q9.32 14.442 9.381 14.381Q9.442 14.32 9.514 14.272Q9.586 14.225 9.665 14.192Q9.745 14.159 9.829 14.142Q9.914 14.125 10 14.125H14Q14.086 14.125 14.171 14.142Q14.255 14.159 14.335 14.192Q14.414 14.225 14.486 14.272Q14.558 14.32 14.619 14.381Q14.68 14.442 14.728 14.514Q14.775 14.586 14.808 14.665Q14.841 14.745 14.858 14.829Q14.875 14.914 14.875 15V19.125H17.125V9.421ZM10.875 19.125H13.125V15.875H10.875Z"/></symbol></svg>
+
+<main>
+  <!-- ===== วันนี้ ===== -->
+  <section class="page" id="pg-today">
+    <header><h1>Squat 100</h1><span class="date" id="today-label"></span></header>
+
+    <div class="clay hero">
+      <div class="ring well">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--lo)" stroke-width="13"></circle>
+          <circle id="ring-fg" cx="60" cy="60" r="50" fill="none" stroke="var(--coral)" stroke-width="13" stroke-linecap="round" stroke-dasharray="314.2" stroke-dashoffset="314.2"></circle>
+        </svg>
+        <div class="c"><span class="big num" id="count">0</span><span class="of">จาก <span id="goal-label">100</span> ครั้ง</span></div>
+      </div>
+      <div class="facts">
+        <div class="fact"><svg class="ic"><use href="#i-flame"/></svg><b id="kcal">0</b><span>kcal วันนี้</span></div>
+        <div class="fact"><svg class="ic"><use href="#i-heart"/></svg><b id="hr-now">–</b><span id="hr-lbl">ชีพจรเฉลี่ย</span></div>
+        <div class="fact" id="next"><svg class="ic"><use href="#i-notification-bell"/></svg><b id="next-t">–</b><span id="next-s"></span></div>
+      </div>
+    </div>
+
+    <div class="sets" id="sets" aria-label="เซ็ตวันนี้"></div>
+
+    <div class="clay counter">
+      <div class="seg well" role="group" aria-label="โหมดนับ">
+        <button type="button" id="m-tap" aria-pressed="true">แตะนับเอง</button>
+        <button type="button" id="m-pace" aria-pressed="false"><svg class="ic sm"><use href="#i-speaker-volume"/></svg>ตามเสียงจังหวะ</button>
+      </div>
+      <div class="stepper">
+        <button class="btn round" id="t-minus" type="button" aria-label="ลดจำนวนครั้งของเซ็ตนี้">−</button>
+        <span>เซ็ต <b id="set-no">1</b> · เป้า <b id="t-val">25</b> ครั้ง</span>
+        <button class="btn round" id="t-plus" type="button" aria-label="เพิ่มจำนวนครั้งของเซ็ตนี้">+</button>
+      </div>
+      <button class="tap" id="tap" type="button"><span class="p1" id="tap-n">0</span><span class="p2">แตะ +1 ทุกครั้งที่ยืนขึ้น</span><span class="bar"><i id="tap-bar"></i></span></button>
+      <div class="cue well" id="cue" hidden><span class="big" id="cue-t">พร้อม</span><span class="sm" id="cue-s">ใส่ AirPods แล้วกดเริ่ม · เสียงต่ำ = ลง · เสียงสูง = ขึ้น</span></div>
+      <div class="row" id="tap-row">
+        <button class="btn" id="minus" type="button">−1</button>
+        <button class="btn" id="plus5" type="button">+5</button>
+        <button class="btn" id="plus10" type="button">+10</button>
+        <button class="btn dark" id="finish" type="button"><svg class="ic sm"><use href="#i-checkmark"/></svg>จบเซ็ต</button>
+      </div>
+      <div class="row" id="pace-row" hidden>
+        <button class="btn coral" id="pace-start" type="button"><svg class="ic sm"><use href="#i-play"/></svg>เริ่ม</button>
+        <button class="btn" id="pace-stop" type="button">หยุด</button>
+        <button class="btn dark" id="finish2" type="button"><svg class="ic sm"><use href="#i-checkmark"/></svg>จบเซ็ต</button>
+      </div>
+    </div>
+    <div style="text-align:center"><button class="btn ghost" id="undo-set" type="button" hidden>ลบเซ็ตล่าสุด</button></div>
+  </section>
+
+  <!-- ===== สถิติ ===== -->
+  <section class="page" id="pg-stats" hidden>
+    <header><h1>สถิติ</h1></header>
+    <div class="clay">
+      <h2><svg class="ic sm"><use href="#i-bar-chart"/></svg>14 วันล่าสุด</h2>
+      <div class="trio">
+        <div class="kv"><div class="v" id="streak">0</div><div class="l">วันติดที่ครบเป้า</div></div>
+        <div class="kv"><div class="v" id="best">0</div><div class="l">ดีที่สุด (วัน)</div></div>
+        <div class="kv"><div class="v" id="week">0</div><div class="l">ครั้ง ใน 7 วัน</div></div>
+      </div>
+      <div class="bars well" id="bars"></div>
+      <div class="blabels" id="blabels"></div>
+    </div>
+    <div class="clay">
+      <h2><svg class="ic sm"><use href="#i-flame"/></svg>แคลอรี่</h2>
+      <table class="tbl">
+        <tr><td>สควอต 100 ครั้ง</td><td><span id="k100">0</span> kcal</td></tr>
+        <tr><td>ใช้เวลาประมาณ</td><td><span id="t100">0</span> นาที</td></tr>
+        <tr><td>ต่อ 1 ครั้ง</td><td><span id="k1">0</span> kcal</td></tr>
+        <tr><td>BMI</td><td id="bmi">–</td></tr>
+      </table>
+      <p class="hint">ไม่มีชีพจรใช้สูตร MET ถ้ามีชีพจรใช้สูตร Keytel (เพศ อายุ น้ำหนัก) เป็นค่าประมาณ ±25%</p>
+    </div>
+    <div class="clay">
+      <h2><svg class="ic sm"><use href="#i-heart"/></svg>VO2 max (ประมาณ)</h2>
+      <div class="trio" style="grid-template-columns:1fr 2fr">
+        <div class="kv"><div class="v" id="vo2">–</div><div class="l">ml/kg/นาที</div></div>
+        <div class="kv"><div class="v" id="vo2-band" style="font-size:18px">–</div><div class="l" id="vo2-cmp">ใส่ชีพจรขณะพักเพื่อคำนวณ</div></div>
+      </div>
+      <div class="inrow">
+        <input id="rhr-in" type="number" inputmode="numeric" min="30" max="120" placeholder="ชีพจรขณะพัก เช่น 62" aria-label="ชีพจรขณะพัก">
+        <button class="btn mint" id="rhr-save" type="button">คำนวณ</button>
+      </div>
+      <p class="hint">ดูชีพจรขณะพักจากนาฬิกาหลังตื่นนอน หรือใน Huawei Health · สูตร Uth–Sørensen: 15.3 × (208 − 0.7 × อายุ) ÷ ชีพจรขณะพัก คลาดได้ราว ±10–15%</p>
+    </div>
+  </section>
+
+  <!-- ===== ตั้งค่า ===== -->
+  <section class="page" id="pg-settings" hidden>
+    <header><h1>ตั้งค่า</h1></header>
+
+    <h2 style="margin:4px 4px -4px"><svg class="ic sm"><use href="#i-person"/></svg>ข้อมูลร่างกาย</h2>
+    <div class="clay group">
+      <div class="item"><div class="top"><span class="name">เพศ</span></div>
+        <div class="seg well" role="group" aria-label="เพศ"><button type="button" id="sx-m" aria-pressed="true">ชาย</button><button type="button" id="sx-f" aria-pressed="false">หญิง</button></div></div>
+      <div class="item"><div class="top"><label class="name" for="r-weight">น้ำหนัก</label><span class="val"><span id="v-weight"></span> กก.</span></div><input type="range" id="r-weight" min="35" max="160" step="0.5"></div>
+      <div class="item"><div class="top"><label class="name" for="r-height">ส่วนสูง</label><span class="val"><span id="v-height"></span> ซม.</span></div><input type="range" id="r-height" min="130" max="215" step="1"></div>
+      <div class="item"><div class="top"><label class="name" for="r-age">อายุ</label><span class="val"><span id="v-age"></span> ปี</span></div><input type="range" id="r-age" min="12" max="85" step="1"></div>
+    </div>
+
+    <h2 style="margin:4px 4px -4px"><svg class="ic sm"><use href="#i-home"/></svg>เป้าหมาย</h2>
+    <div class="clay group">
+      <div class="item"><div class="top"><label class="name" for="r-goal">สควอตต่อวัน</label><span class="val"><span id="v-goal"></span> ครั้ง</span></div><input type="range" id="r-goal" min="20" max="300" step="10"></div>
+      <div class="item"><div class="top"><label class="name" for="r-per">ครั้งต่อเซ็ต</label><span class="val"><span id="v-per"></span> ครั้ง</span></div><input type="range" id="r-per" min="5" max="60" step="5"><span class="sub" id="v-sets"></span></div>
+    </div>
+
+    <h2 style="margin:4px 4px -4px"><svg class="ic sm"><use href="#i-notification-bell"/></svg>การเตือน</h2>
+    <div class="clay group">
+      <div class="item"><div class="top"><span class="name">เตือนเซ็ตถัดไปในแอป</span><label class="switch"><input type="checkbox" id="sw-remind" aria-label="เตือนเซ็ตถัดไปในแอป"><span></span></label></div></div>
+      <div class="item"><div class="top"><span class="name">เตือนทุก</span></div>
+        <div class="seg well" role="group" aria-label="เตือนทุกกี่ชั่วโมง" id="every-seg"><button type="button" data-h="1">1 ชม.</button><button type="button" data-h="2">2 ชม.</button><button type="button" data-h="3">3 ชม.</button><button type="button" data-h="4">4 ชม.</button></div></div>
+      <div class="item"><div class="top"><span class="name">ช่วงเวลา</span></div><div class="times"><input type="time" id="s-from" aria-label="เริ่มเตือน"><input type="time" id="s-to" aria-label="เลิกเตือน"></div></div>
+      <div class="item"><button class="btn mint" id="ics" type="button"><svg class="ic sm"><use href="#i-calendar"/></svg>เพิ่มเตือนลงปฏิทินมือถือ</button><span class="sub">ให้มือถือและนาฬิกาเด้งเตือนแม้ปิดแอป เปิดไฟล์แล้วเลือก "เพิ่มทั้งหมด"</span></div>
+    </div>
+
+    <h2 style="margin:4px 4px -4px"><svg class="ic sm"><use href="#i-speaker-volume"/></svg>เสียงและการสั่น</h2>
+    <div class="clay group">
+      <div class="item"><div class="top"><span class="name">เสียงบี๊บ</span><label class="switch"><input type="checkbox" id="sw-sound" aria-label="เสียงบี๊บ"><span></span></label></div></div>
+      <div class="item"><div class="top"><span class="name">พูดตัวเลขทุก 10 ครั้ง</span><label class="switch"><input type="checkbox" id="sw-voice" aria-label="พูดตัวเลข"><span></span></label></div></div>
+      <div class="item"><div class="top"><span class="name">สั่น (Android)</span><label class="switch"><input type="checkbox" id="sw-vibe" aria-label="สั่น"><span></span></label></div></div>
+      <div class="item"><div class="top"><label class="name" for="r-pace">ความเร็วจังหวะ</label><span class="val"><span id="v-pace"></span> วิ/ครั้ง</span></div><input type="range" id="r-pace" min="1.5" max="5" step="0.1"></div>
+    </div>
+
+    <h2 style="margin:4px 4px -4px"><svg class="ic sm"><use href="#i-wristwatch"/></svg>นาฬิกา</h2>
+    <div class="clay group">
+      <div class="item"><div class="top"><span class="name" id="w-t">ชีพจรสดผ่านบลูทูธ</span><button class="btn" id="w-btn" type="button" style="flex:none;padding-inline:14px">เชื่อม</button></div>
+        <span class="sub" id="w-s">เปิด Settings > HR Data Broadcasts บนนาฬิกาก่อน · iPhone ต้องเปิดเว็บผ่านแอป Bluefy</span></div>
+      <div class="item"><div class="top"><span class="name">ถามชีพจรหลังจบเซ็ต</span><label class="switch"><input type="checkbox" id="sw-askhr" aria-label="ถามชีพจรหลังจบเซ็ต"><span></span></label></div></div>
+    </div>
+
+    <h2 style="margin:4px 4px -4px"><svg class="ic sm"><use href="#i-settings"/></svg>ขั้นสูง</h2>
+    <div class="clay group">
+      <div class="item"><div class="top"><label class="name" for="r-met">ค่า MET (ความหนักของสควอต)</label><span class="val" id="v-met"></span></div><input type="range" id="r-met" min="3" max="8" step="0.5"></div>
+      <div class="item"><button class="btn" id="reset" type="button"><svg class="ic sm"><use href="#i-trash-can"/></svg>ล้างข้อมูลทั้งหมด</button><span class="sub">ข้อมูลเก็บในมือถือเครื่องนี้เท่านั้น ล้างแล้วกู้คืนไม่ได้</span></div>
+    </div>
+    <p class="credit">Icons by <a href="https://iconsaga.com" target="_blank" rel="noopener">IconSaga · iconsaga.com</a></p>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="เมนู">
+  <a href="#today" id="tab-today" aria-current="page"><svg class="ic"><use href="#i-home"/></svg>วันนี้</a>
+  <a href="#stats" id="tab-stats"><svg class="ic"><use href="#i-bar-chart"/></svg>สถิติ</a>
+  <a href="#settings" id="tab-settings"><svg class="ic"><use href="#i-settings"/></svg>ตั้งค่า</a>
+</nav>
+
+<div class="scrim" id="hr-sheet" hidden>
+  <div class="clay sheet" role="dialog" aria-modal="true" aria-labelledby="hr-q">
+    <div class="q" id="hr-q"><svg class="ic"><use href="#i-heart"/></svg>ชีพจรตอนจบเซ็ตเท่าไหร่?</div>
+    <span class="muted" style="font-size:13px" id="hr-zone">ดูตัวเลขหัวใจบนนาฬิกาแล้วพิมพ์ แอปจะใช้คำนวณแคลให้แม่นขึ้น</span>
+    <div class="inrow" style="margin:0">
+      <input id="hr-in" type="number" inputmode="numeric" min="40" max="220" placeholder="เช่น 128" aria-label="ชีพจร">
+      <button class="btn mint" id="hr-save" type="button">บันทึก</button>
+      <button class="btn" id="hr-skip" type="button">ข้าม</button>
+    </div>
+  </div>
+</div>
 
 <section class="onb" id="onb" hidden aria-label="ตั้งค่าครั้งแรก">
   <div class="in">
     <h1>Squat 100</h1>
-    <p>สควอตวันละ 100 ครั้ง แบ่งเป็นเซ็ตตลอดวัน แอปนับให้และคำนวณแคลอรี่จากข้อมูลร่างกายของคุณ ข้อมูลทั้งหมดเก็บในมือถือเครื่องนี้เท่านั้น ไม่ต้องสมัครสมาชิก</p>
-    <div class="clay form" style="margin-top:0">
-      <label class="full">เพศ (ใช้ในสูตรคำนวณแคล)
-        <span class="seg"><button type="button" class="btn" id="o-m" aria-pressed="true">ชาย</button><button type="button" class="btn" id="o-f" aria-pressed="false">หญิง</button></span></label>
-      <label>น้ำหนัก (กก.)<input id="o-weight" type="number" inputmode="decimal" min="30" max="250" step="0.1" placeholder="เช่น 70"></label>
-      <label>ส่วนสูง (ซม.)<input id="o-height" type="number" inputmode="decimal" min="100" max="230" placeholder="เช่น 170"></label>
-      <label>อายุ (ปี)<input id="o-age" type="number" inputmode="numeric" min="12" max="90" placeholder="เช่น 25"></label>
-      <label>เป้าต่อวัน (ครั้ง)<input id="o-goal" type="number" inputmode="numeric" min="10" max="1000" step="5" value="100"></label>
-      <div class="err full" id="o-err"></div>
-      <button class="btn coral full" id="o-go" type="button">เริ่มใช้งาน</button>
+    <p>สควอตวันละ 100 ครั้ง แบ่งเป็นเซ็ตตลอดวัน แอปนับให้และคำนวณแคลอรี่จากข้อมูลร่างกายของคุณ ข้อมูลเก็บในมือถือเครื่องนี้เท่านั้น</p>
+    <div class="clay group">
+      <div class="item"><div class="top"><span class="name">เพศ</span></div>
+        <div class="seg well" role="group" aria-label="เพศ"><button type="button" id="o-m" aria-pressed="true">ชาย</button><button type="button" id="o-f" aria-pressed="false">หญิง</button></div></div>
+      <div class="item"><div class="top"><label class="name" for="o-weight">น้ำหนัก</label><span class="val"><span id="ov-weight">70</span> กก.</span></div><input type="range" id="o-weight" min="35" max="160" step="0.5" value="70"></div>
+      <div class="item"><div class="top"><label class="name" for="o-height">ส่วนสูง</label><span class="val"><span id="ov-height">170</span> ซม.</span></div><input type="range" id="o-height" min="130" max="215" step="1" value="170"></div>
+      <div class="item"><div class="top"><label class="name" for="o-age">อายุ</label><span class="val"><span id="ov-age">25</span> ปี</span></div><input type="range" id="o-age" min="12" max="85" step="1" value="25"></div>
+      <div class="item"><div class="top"><label class="name" for="o-goal">เป้าต่อวัน</label><span class="val"><span id="ov-goal">100</span> ครั้ง</span></div><input type="range" id="o-goal" min="20" max="300" step="10" value="100"></div>
     </div>
+    <button class="btn coral" id="o-go" type="button" style="padding:14px">เริ่มใช้งาน</button>
+    <p class="credit">Icons by <a href="https://iconsaga.com" target="_blank" rel="noopener">IconSaga · iconsaga.com</a></p>
   </div>
 </section>
 
-<main>
-  <header>
-    <h1>Squat 100</h1>
-    <span class="date" id="today-label"></span>
-  </header>
-
-  <section class="clay hero" aria-label="ความคืบหน้าวันนี้">
-    <div class="ring clay-in">
-      <svg viewBox="0 0 120 120" aria-hidden="true">
-        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--lo)" stroke-width="13"></circle>
-        <circle id="ring-fg" cx="60" cy="60" r="50" fill="none" stroke="var(--coral)" stroke-width="13" stroke-linecap="round" stroke-dasharray="314.2" stroke-dashoffset="314.2"></circle>
-      </svg>
-      <div class="center"><span class="big num" id="count">0</span><span class="of">จาก <span id="goal-label">100</span> ครั้ง</span></div>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="v num" id="kcal">0</div><div class="l">kcal วันนี้ (ประมาณ)</div></div>
-      <div class="stat"><div class="v num" id="hr-avg">–</div><div class="l">ชีพจรเฉลี่ยหลังเซ็ต (bpm)</div></div>
-      <span class="pill" id="status">เริ่มกันเลย</span>
-    </div>
-  </section>
-
-  <section class="clay next" id="next" aria-live="polite">
-    <div class="bell" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#3A2A05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
-    <div><div class="t" id="next-t">เซ็ตถัดไป</div><div class="s" id="next-s"></div></div>
-  </section>
-
-  <section class="clay next" id="watch" aria-label="เชื่อมนาฬิกา">
-    <div class="bell" style="background:var(--mint)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#0E2C20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></svg></div>
-    <div style="flex:1;min-width:0"><div class="t" id="w-t">ชีพจรสดจากนาฬิกา</div><div class="s" id="w-s">ต้องเปิด "แชร์ข้อมูลชีพจร" บนนาฬิกาก่อน</div></div>
-    <button class="btn" id="w-btn" type="button" style="flex:none;padding-inline:14px">เชื่อม</button>
-  </section>
-
-  <section class="clay" aria-label="เซ็ตวันนี้">
-    <h2>เซ็ตวันนี้</h2>
-    <div class="sets" id="sets"></div>
-    <div class="setmeta"><span id="lastset">ยังไม่ได้เริ่มเซ็ตแรก</span><button class="linkbtn" id="undo-set" hidden>ลบเซ็ตล่าสุด</button></div>
-  </section>
-
-  <section class="clay hr" id="hr-box" hidden aria-label="บันทึกชีพจร">
-    <div class="q">ชีพจรตอนจบเซ็ตเท่าไหร่?</div>
-    <p class="hint">ดูตัวเลขหัวใจบนสมาร์ทวอทช์ทันทีที่จบเซ็ต แล้วพิมพ์ที่นี่ แอปจะใช้คำนวณแคลให้แม่นขึ้น</p>
-    <div class="hr-row">
-      <input id="hr-in" type="number" inputmode="numeric" min="40" max="220" placeholder="เช่น 128" aria-label="ชีพจร (ครั้งต่อนาที)">
-      <button class="btn mint" id="hr-save">บันทึก</button>
-      <button class="btn" id="hr-skip">ข้าม</button>
-    </div>
-    <div class="zone" id="hr-zone"></div>
-  </section>
-
-  <div class="tabs clay-in" role="tablist">
-    <button role="tab" id="tab-tap" aria-selected="true">แตะนับเอง</button>
-    <button role="tab" id="tab-pace" aria-selected="false">ทำตามเสียงจังหวะ</button>
-  </div>
-
-  <div class="clay target">
-    <button class="btn round" id="t-minus" aria-label="ลดจำนวนครั้งของเซ็ตนี้">−</button>
-    <div style="text-align:center"><div class="lbl">เซ็ตนี้ทำ</div><div class="val" id="t-val">25</div><div class="lbl">ครั้ง</div></div>
-    <button class="btn round" id="t-plus" aria-label="เพิ่มจำนวนครั้งของเซ็ตนี้">+</button>
-  </div>
-
-  <section id="mode-tap" class="stack">
-    <button class="tap" id="tap">+1<small id="tap-sub">เซ็ต 1 · 0/25</small></button>
-    <div class="row">
-      <button class="btn" id="minus">−1</button>
-      <button class="btn" id="plus5">+5</button>
-      <button class="btn" id="plus10">+10</button>
-      <button class="btn dark" id="finish">จบเซ็ต</button>
-    </div>
-    <p class="hint">ครบจำนวนแล้วแอปบันทึกเซ็ตพร้อมเวลาให้เอง ถ้าทำได้น้อยกว่านั้นให้กด "จบเซ็ต" ปุ่ม − / + ด้านบนใช้ลดหรือเพิ่มจำนวนครั้งของเซ็ตนี้ทีละ 5</p>
-  </section>
-
-  <section id="mode-pace" class="stack" hidden>
-    <div class="clay stack">
-      <div class="cue" id="cue">พร้อม</div>
-      <div class="row">
-        <button class="btn coral" id="pace-start">เริ่ม</button>
-        <button class="btn" id="pace-stop">หยุด</button>
-      </div>
-      <p class="hint">ใส่ AirPods แล้วกดเริ่ม เสียงต่ำ = ย่อลง เสียงสูง = ยืนขึ้น แอปนับให้เองและหยุดเมื่อครบเซ็ต</p>
-    </div>
-  </section>
-
-  <section class="clay" aria-label="สถิติ">
-    <h2>สถิติ 14 วัน</h2>
-    <div class="streakline">
-      <div class="stat"><div class="v num" id="streak">0</div><div class="l">วันติดที่ครบเป้า</div></div>
-      <div class="stat"><div class="v num" id="best">0</div><div class="l">ดีที่สุด (วัน)</div></div>
-      <div class="stat"><div class="v num" id="week">0</div><div class="l">ครั้ง ใน 7 วัน</div></div>
-    </div>
-    <div class="bars clay-in" id="bars"></div>
-    <div class="barlabels" id="barlabels"></div>
-  </section>
-
-  <section class="clay calc" aria-label="แคลอรี่">
-    <h2>แคลอรี่จากสควอต</h2>
-    <table>
-      <tr><td>สควอต 100 ครั้ง (ไม่ใส่ชีพจร)</td><td><span id="k100">0</span> kcal</td></tr>
-      <tr><td>ใช้เวลาประมาณ</td><td><span id="t100">0</span> นาที</td></tr>
-      <tr><td>ต่อ 1 ครั้ง</td><td><span id="k1">0</span> kcal</td></tr>
-      <tr><td>BMI ของคุณ</td><td><span id="bmi">–</span></td></tr>
-    </table>
-    <p class="hint" style="margin-top:10px">ถ้าไม่ได้ใส่ชีพจร ใช้สูตร MET (ค่าเดา MET 5.0, 2.5 วินาที/ครั้ง) ถ้าใส่ชีพจร ใช้สูตรจากอัตราการเต้นหัวใจ (Keytel) กับน้ำหนัก อายุ เพศของคุณ ทั้งสองแบบเป็นค่าประมาณ อาจคลาดราว ±25%</p>
-  </section>
-
-  <section class="clay" aria-label="VO2 max">
-    <h2>VO2 max (ประมาณ)</h2>
-    <div class="streakline" style="grid-template-columns:repeat(2,minmax(0,1fr))">
-      <div class="stat"><div class="v num" id="vo2">–</div><div class="l">ml/kg/นาที</div></div>
-      <div class="stat"><div class="v" id="vo2-band" style="font-size:18px">–</div><div class="l" id="vo2-cmp">เทียบคนวัยเดียวกัน</div></div>
-    </div>
-    <div class="hr-row">
-      <input id="rhr-in" type="number" inputmode="numeric" min="30" max="120" placeholder="ชีพจรขณะพัก เช่น 62" aria-label="ชีพจรขณะพัก (ครั้งต่อนาที)">
-      <button class="btn mint" id="rhr-save" type="button">คำนวณ</button>
-    </div>
-    <p class="hint" style="margin-top:10px">ใส่ชีพจรขณะพัก ดูได้จากนาฬิกาตอนเช้าหลังตื่นนอน หรือในแอป Huawei Health (หัวข้ออัตราการเต้นหัวใจ > ขณะพัก) แอปใช้สูตร Uth–Sørensen: 15.3 × ชีพจรสูงสุด ÷ ชีพจรขณะพัก (ชีพจรสูงสุดประมาณจาก 208 − 0.7 × อายุ) เป็นค่าประมาณคร่าวๆ อาจคลาด ±10–15% ค่าที่แม่นกว่าดูได้ใน Huawei Health หลังวิ่งกลางแจ้งใส่นาฬิกา</p>
-  </section>
-
-  <section class="clay">
-    <details>
-      <summary>ตั้งค่า</summary>
-      <div class="form">
-        <label>เป้าต่อวัน (ครั้ง)<input id="s-goal" type="number" inputmode="numeric" min="10" max="1000" step="5"></label>
-        <label>ครั้งต่อเซ็ต (ปกติ)<input id="s-per" type="number" inputmode="numeric" min="1" max="200" step="1"></label>
-        <label>เตือนทุก<select id="s-every"><option value="1">1 ชั่วโมง</option><option value="2">2 ชั่วโมง</option><option value="3">3 ชั่วโมง</option><option value="4">4 ชั่วโมง</option></select></label>
-        <label>น้ำหนัก (กก.)<input id="s-weight" type="number" inputmode="decimal" min="30" max="250" step="0.1"></label>
-        <label>เริ่มเตือน<input id="s-from" type="time"></label>
-        <label>เลิกเตือน<input id="s-to" type="time"></label>
-        <label>อายุ (ปี)<input id="s-age" type="number" inputmode="numeric" min="12" max="90"></label>
-        <label>ส่วนสูง (ซม.)<input id="s-height" type="number" inputmode="decimal" min="100" max="230"></label>
-        <label>เพศ<select id="s-sex"><option value="m">ชาย</option><option value="f">หญิง</option></select></label>
-        <label>วินาทีต่อครั้ง<input id="s-pace" type="number" inputmode="decimal" min="1.2" max="8" step="0.1"></label>
-        <label>ค่า MET<input id="s-met" type="number" inputmode="decimal" min="2" max="10" step="0.5"></label>
-        <p class="hint full">การเตือนในหน้านี้ทำงานเฉพาะตอนเปิดแอปค้างไว้ ถ้าอยากให้มือถือและนาฬิกาเด้งเตือนแม้ปิดแอป กดปุ่มด้านล่างเพื่อเพิ่มนัดเตือนลงปฏิทินตามเวลาที่ตั้งไว้</p>
-        <div class="minirow full">
-          <button class="btn mint" id="ics" type="button">เพิ่มเตือนลงปฏิทิน</button>
-        </div>
-        <p class="hint full">ข้อมูลเก็บในเบราว์เซอร์ของมือถือเครื่องนี้เท่านั้น ถ้าล้างข้อมูลเบราว์เซอร์หรือเปลี่ยนเครื่อง ประวัติจะหายไป</p>
-        <div class="minirow full">
-          <button class="btn" id="reset" type="button">ล้างข้อมูลทั้งหมด</button>
-        </div>
-      </div>
-    </details>
-  </section>
-
-  <div class="sync" id="sync">กำลังโหลด…</div>
-</main>
+<div class="toast" id="toast" hidden></div>
 
 <script>
 (function(){
-  const DEF = {weight:70, height:170, sex:"m", age:25, goal:100, per:25, every:2, from:"08:00", to:"22:00", pace:2.5, met:5.0};
+  const DEF = {weight:70, height:170, sex:"m", age:25, goal:100, per:25, every:2, from:"08:00", to:"22:00", pace:2.5, met:5.0,
+               remind:true, sound:true, voice:true, vibe:true, askHR:true};
   let settings = {...DEF};
-  // days: "YYYY-MM-DD" -> {sets:[{t:"HH:MM", n, hr?}], cur, target?}
   let days = {};
-  let db = null, uid = null;
   const LS = "squat100.web.v1";
 
   const $ = id => document.getElementById(id);
@@ -330,6 +363,7 @@ details summary{cursor:pointer;font-family:var(--display);font-size:16px}
   const nowHM = () => { const d=new Date(); return pad(d.getHours())+":"+pad(d.getMinutes()); };
   const toMin = hm => { const m=/^(\d{1,2}):(\d{2})$/.exec(hm||""); return m ? (+m[1])*60+(+m[2]) : null; };
   const fromMin = m => pad(Math.floor(m/60)%24)+":"+pad(m%60);
+  const fmt = (n,d=0) => n.toLocaleString("th-TH",{maximumFractionDigits:d,minimumFractionDigits:d});
 
   function norm(v){
     if(typeof v === "number") return {sets: v>0 ? [{t:"", n:v}] : [], cur:0};
@@ -341,361 +375,329 @@ details summary{cursor:pointer;font-family:var(--display);font-size:16px}
   }
   const total = d => d ? d.sets.reduce((a,x)=>a+x.n,0) + d.cur : 0;
   const day = (k=todayKey()) => (days[k] ||= {sets:[], cur:0});
-  const curTarget = () => { const D=day(); return Math.max(1, D.target || settings.per); };
+  const curTarget = () => Math.max(1, day().target || settings.per);
 
-  function fixSettings(s){
-    const o = {...DEF, ...(s||{})};
-    if(s && s.sets && !s.per) o.per = Math.max(1, Math.ceil(o.goal / s.sets));   // version 2 stored a number of sets
-    delete o.sets; return o;
-  }
-  function lsLoad(){ try{ const s = JSON.parse(localStorage.getItem(LS)||"null"); if(s){ days={}; for(const k in (s.days||{})) days[k]=norm(s.days[k]); settings = fixSettings(s.settings); } }catch(e){} }
-  function lsSave(){ try{ localStorage.setItem(LS, JSON.stringify({days, settings})); }catch(e){} }
+  function lsLoad(){ try{ const s = JSON.parse(localStorage.getItem(LS)||"null"); if(s){ days={}; for(const k in (s.days||{})) days[k]=norm(s.days[k]); settings = {...DEF, ...(s.settings||{})}; delete settings.sets; } }catch(e){} }
+  function save(){ try{ localStorage.setItem(LS, JSON.stringify({days, settings})); }catch(e){} }
 
-  // calories
+  let toastT=null;
+  function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true, 3200); }
+
+  // ---- calories / health
   const metKcalPerRep = () => settings.met * 3.5 * settings.weight / 200 / 60 * settings.pace;
-  function keytelKcal(hr, reps){   // Keytel et al. 2005: kcal/min from heart rate, weight, age, sex
+  function keytelKcal(hr, reps){
     const W = settings.weight, A = settings.age;
-    const perMin = settings.sex==="f"
-      ? (-20.4022 + 0.4472*hr - 0.1263*W + 0.074*A) / 4.184
-      : (-55.0969 + 0.6309*hr + 0.1988*W + 0.2017*A) / 4.184;
+    const perMin = settings.sex==="f" ? (-20.4022 + 0.4472*hr - 0.1263*W + 0.074*A) / 4.184
+                                      : (-55.0969 + 0.6309*hr + 0.1988*W + 0.2017*A) / 4.184;
     return Math.max(0, perMin) * reps * settings.pace / 60;
   }
   const setKcal = x => typeof x.hr==="number" ? keytelKcal(x.hr, x.n) : x.n * metKcalPerRep();
   const dayKcal = D => D.sets.reduce((a,x)=>a+setKcal(x),0) + D.cur*metKcalPerRep();
-  const fmt = (n,d=0) => n.toLocaleString("th-TH",{maximumFractionDigits:d,minimumFractionDigits:d});
-  const maxHR = () => 220 - settings.age;
+  const maxHR = () => Math.round(208 - 0.7*settings.age);
 
   function streaks(){
     const g = settings.goal; let cur = 0, best = 0, run = 0;
     const d = new Date(); if(total(days[key(d)]) < g) d.setDate(d.getDate()-1);
     for(;;){ if(total(days[key(d)]) >= g){ cur++; d.setDate(d.getDate()-1); } else break; }
-    const ks = Object.keys(days).filter(k=>total(days[k])>=g).sort();
     let prev = null;
-    for(const k of ks){ const t = new Date(k+"T12:00:00"); run = (prev && (t-prev)/864e5 < 1.5) ? run+1 : 1; best = Math.max(best, run); prev = t; }
+    for(const k of Object.keys(days).filter(k=>total(days[k])>=g).sort()){ const t = new Date(k+"T12:00:00"); run = (prev && (t-prev)/864e5 < 1.5) ? run+1 : 1; best = Math.max(best, run); prev = t; }
     return {cur, best:Math.max(best,cur)};
   }
 
-  // ---- reminder (in page, while open)
+  // ---- next set
   function nextInfo(){
-    const D = day(), n = total(D);
-    const now = new Date(), nm = now.getHours()*60+now.getMinutes();
+    const D = day(), n = total(D), nm = new Date().getHours()*60+new Date().getMinutes();
     if(n >= settings.goal) return {state:"done"};
     if(D.cur > 0) return {state:"active"};
-    const a = toMin(settings.from), b = toMin(settings.to), step = settings.every*60;
-    const last = D.sets.length ? toMin(D.sets[D.sets.length-1].t) : null;
-    let due;
-    if(last != null) due = last + step;
-    else if(a != null && nm < a) due = a;
-    else due = nm;   // no set yet today and the window has started: now
+    const a = toMin(settings.from), b = toMin(settings.to), last = D.sets.length ? toMin(D.sets[D.sets.length-1].t) : null;
+    let due = last != null ? last + settings.every*60 : (a != null && nm < a ? a : nm);
     if(a != null && due < a) due = a;
-    if(b != null && due > b) return {state:"later", left: settings.goal-n};
-    return {state: due <= nm ? "due" : "wait", due, mins: due-nm, left: settings.goal-n};
+    if(b != null && due > b) return {state:"later"};
+    return {state: due <= nm ? "due" : "wait", due, mins: due-nm};
   }
   let lastAlerted = null;
   function renderNext(){
-    const info = nextInfo(), box = $("next");
-    box.classList.toggle("due", info.state==="due");
-    const t=$("next-t"), s=$("next-s");
-    if(info.state==="done"){ t.textContent="ครบเป้าวันนี้แล้ว"; s.textContent="พักได้เลย พรุ่งนี้เจอกันใหม่"; }
-    else if(info.state==="active"){ t.textContent="กำลังทำเซ็ตอยู่"; s.textContent="ทำต่อให้ครบ "+curTarget()+" ครั้ง"; }
-    else if(info.state==="later"){ t.textContent="เลยช่วงเตือนของวันนี้แล้ว"; s.textContent="ยังเหลือ "+info.left+" ครั้ง ถ้ายังไหวทำเพิ่มได้"; }
-    else if(info.state==="due"){ t.textContent="ถึงเวลาสควอตแล้ว!"; s.textContent="เซ็ตนี้ "+curTarget()+" ครั้ง · วันนี้เหลือ "+info.left+" ครั้ง";
+    const info = nextInfo(), t=$("next-t"), s=$("next-s");
+    $("next").classList.toggle("due", info.state==="due" && settings.remind);
+    if(info.state==="done"){ t.textContent="ครบแล้ว"; s.textContent="พักได้เลย"; }
+    else if(info.state==="active"){ t.textContent="กำลังทำ"; s.textContent="เซ็ตนี้"; }
+    else if(info.state==="later"){ t.textContent="–"; s.textContent="เลยช่วงเตือนแล้ว"; }
+    else if(info.state==="due"){ t.textContent="ตอนนี้"; s.textContent="ถึงเวลาสควอต";
       const tag = todayKey()+"@"+info.due;
-      if(lastAlerted !== tag){ const first = lastAlerted===null; lastAlerted = tag; if(!first && document.visibilityState==="visible"){ chime(); buzz([200,100,200]); } } }
-    else { const h=Math.floor(info.mins/60), m=info.mins%60;
-      t.textContent="เซ็ตถัดไป "+fromMin(info.due)+" น.";
-      s.textContent="อีก "+(h? h+" ชม. ":"")+m+" นาที · เตือนทุก "+settings.every+" ชม."; lastAlerted = lastAlerted ?? "wait"; }
+      if(settings.remind && lastAlerted !== tag){ const first = lastAlerted===null; lastAlerted = tag; if(!first && document.visibilityState==="visible"){ chime(); buzz([200,100,200]); toast("ถึงเวลาสควอตเซ็ตถัดไปแล้ว"); } } }
+    else { t.textContent=fromMin(info.due); const h=Math.floor(info.mins/60), m=info.mins%60; s.textContent="อีก "+(h? h+" ชม. ":"")+m+" นาที"; if(lastAlerted===null) lastAlerted="wait"; }
   }
 
-  function cell(cls, label, value, sub, extra){
+  function chip(cls, value, sub){
     const c=document.createElement("div"); c.className="set "+cls;
-    const parts=[["sn",label],["sv",value],["st",sub]]; if(extra) parts.push(["st",extra]);
-    for(const [k,t] of parts){ const e=document.createElement("span"); e.className=k; e.textContent=t; c.appendChild(e); }
-    return c;
+    const a=document.createElement("span"); a.className="sv"; a.textContent=value;
+    const b=document.createElement("span"); b.className="st"; b.textContent=sub;
+    c.append(a,b); return c;
   }
 
   function render(){
     const D = day(), n = total(D), g = settings.goal, ps = curTarget();
-    $("count").textContent = n;
-    $("goal-label").textContent = g;
+    $("count").textContent = n; $("goal-label").textContent = g;
     $("kcal").textContent = fmt(dayKcal(D),1);
-    const hrs = D.sets.filter(x=>typeof x.hr==="number").map(x=>x.hr);
-    $("hr-avg").textContent = hrs.length ? Math.round(hrs.reduce((a,b)=>a+b,0)/hrs.length) : "–";
     $("ring-fg").setAttribute("stroke-dashoffset", 314.2*(1-Math.min(1,n/g)));
     $("ring-fg").setAttribute("stroke", n>=g ? "var(--mint)" : "var(--coral)");
-    const st = $("status");
-    if(n>=g){ st.textContent="ครบเป้าแล้ว"; st.className="pill ok"; }
-    else if(n>0){ st.textContent="อีก "+(g-n)+" ครั้ง"; st.className="pill"; }
-    else { st.textContent="เริ่มกันเลย"; st.className="pill"; }
+    if(liveHR){ $("hr-now").textContent = liveHR; $("hr-lbl").textContent = "bpm สด"; }
+    else { const hrs = D.sets.filter(x=>typeof x.hr==="number").map(x=>x.hr);
+      $("hr-now").textContent = hrs.length ? Math.round(hrs.reduce((a,b)=>a+b,0)/hrs.length) : "–"; $("hr-lbl").textContent = "ชีพจรเฉลี่ย"; }
 
     const box = $("sets"); box.textContent = "";
-    D.sets.forEach((x,i)=> box.appendChild(cell("done", "เซ็ต "+(i+1), x.n, x.t||"—", typeof x.hr==="number" ? "♥ "+x.hr : "")));
-    const curIdx = D.sets.length;
-    if(n < g || D.cur > 0) box.appendChild(cell("now", "เซ็ต "+(curIdx+1), D.cur+"/"+ps, "กำลังทำ"));
-    let remain = g - n - (n<g ? Math.max(0, ps - D.cur) : 0), j = curIdx + 2;
-    while(remain > 0){ const v=Math.min(settings.per,remain); box.appendChild(cell("todo", "เซ็ต "+j, v, "รอทำ")); remain-=v; j++; }
-    const last = D.sets[D.sets.length-1];
-    $("lastset").textContent = last ? ("ทำไปแล้ว "+D.sets.length+" เซ็ต" + (last.t ? " · ล่าสุด "+last.t+" น." : "")) : "ยังไม่ได้เริ่มเซ็ตแรก";
-    $("undo-set").hidden = !last;
-    $("tap-sub").textContent = "เซ็ต "+(curIdx+1)+" · "+D.cur+"/"+ps;
-    $("t-val").textContent = ps;
+    D.sets.forEach(x=> box.appendChild(chip("done", x.n, (x.t||"—")+(typeof x.hr==="number" ? " ♥"+x.hr : ""))));
+    if(n < g || D.cur > 0) box.appendChild(chip("now", D.cur+"/"+ps, "กำลังทำ"));
+    let remain = g - n - (n<g ? Math.max(0, ps - D.cur) : 0);
+    while(remain > 0){ const v=Math.min(settings.per,remain); box.appendChild(chip("todo", v, "รอทำ")); remain-=v; }
+    const nowChip = box.querySelector(".now"); if(nowChip && nowChip.scrollIntoView) try{ nowChip.scrollIntoView({block:"nearest", inline:"center"}); }catch(e){}
+    $("undo-set").hidden = !D.sets.length;
+    $("set-no").textContent = D.sets.length+1; $("t-val").textContent = ps;
+    $("tap-n").textContent = D.cur+" / "+ps;
+    $("tap-bar").style.width = Math.min(100, D.cur/ps*100)+"%";
+    renderNext();
+    renderStats();
+  }
 
-    const s = streaks(); $("streak").textContent = s.cur; $("best").textContent = s.best;
-    const bars = $("bars"), labels = $("barlabels"); bars.textContent=""; labels.textContent="";
-    let week = 0, max = g; const list = [];
-    for(let i=13;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const dd=days[key(d)]; const v=total(dd); list.push([d,v,i,dd]); max=Math.max(max,v); if(i<7) week+=v; }
-    for(const [d,v,i,dd] of list){
-      const b=document.createElement("div"); b.className="bar"+(v>=g?" hit":"")+(i===0?" today":"");
-      b.style.height=Math.max(4, v/max*100)+"%"; b.title=key(d)+": "+v+" ครั้ง"+(dd&&dd.sets.length?" ใน "+dd.sets.length+" เซ็ต":""); bars.appendChild(b);
+  function renderStats(){
+    const g = settings.goal, s = streaks();
+    $("streak").textContent = s.cur; $("best").textContent = s.best;
+    const bars=$("bars"), labels=$("blabels"); bars.textContent=""; labels.textContent="";
+    let week=0, max=g; const list=[];
+    for(let i=13;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const v=total(days[key(d)]); list.push([d,v,i]); max=Math.max(max,v); if(i<7) week+=v; }
+    for(const [d,v,i] of list){
+      const b=document.createElement("div"); b.className="b"+(v>=g?" hit":"")+(i===0?" today":""); b.style.height=Math.max(4, v/max*100)+"%"; b.title=key(d)+": "+v+" ครั้ง"; bars.appendChild(b);
       const l=document.createElement("div"); l.textContent=thDays[d.getDay()]; if(i===0){ l.style.fontWeight="700"; l.style.color="var(--ink)"; } labels.appendChild(l);
     }
     $("week").textContent = week;
-
     const k1 = metKcalPerRep();
-    $("k100").textContent = fmt(k1*100,0);
-    $("t100").textContent = fmt(settings.pace*100/60,1);
-    $("k1").textContent = fmt(k1,2);
-    const hm = settings.height/100; const bmi = settings.weight/(hm*hm);
-    $("bmi").textContent = isFinite(bmi) ? fmt(bmi,1)+(bmi<18.5?" (น้อย)":bmi<23?" (ปกติ)":bmi<25?" (เกินเล็กน้อย)":bmi<30?" (อ้วนระดับ 1)":" (อ้วนระดับ 2)") : "–";
-    renderNext();
+    $("k100").textContent = fmt(k1*100,0); $("t100").textContent = fmt(settings.pace*100/60,1); $("k1").textContent = fmt(k1,2);
+    const hm = settings.height/100, bmi = settings.weight/(hm*hm);
+    $("bmi").textContent = fmt(bmi,1)+(bmi<18.5?" (น้อย)":bmi<23?" (ปกติ)":bmi<25?" (เกินเล็กน้อย)":bmi<30?" (อ้วนระดับ 1)":" (อ้วนระดับ 2)");
+    renderVO2();
   }
 
-  // ---- saving
-  let saveTimer = null, pendingDays = new Set(), settingsDirty = false;
-  function scheduleSave(dayKey, now){
-    if(dayKey) pendingDays.add(dayKey);
-    lsSave();
-    clearTimeout(saveTimer); saveTimer = setTimeout(flush, now ? 50 : 900);
-  }
-  function flush(){}
-
-  function buzz(p){ if(navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
-  function chime(){ beep(880,.15); setTimeout(()=>beep(1175,.25),170); }
-
-  // ---- heart rate after a set
-  let hrFor = null;
-  function askHR(idx){
-    hrFor = idx; $("hr-in").value = ""; $("hr-zone").textContent = "ชีพจรสูงสุดโดยประมาณของคุณ "+maxHR()+" bpm (220 − อายุ)";
-    $("hr-box").hidden = false;
-  }
-  function saveHR(){
-    const v = parseInt($("hr-in").value,10);
-    if(!(v>=40 && v<=220)){ $("hr-zone").textContent = "ใส่ตัวเลขระหว่าง 40–220 ครั้งต่อนาที"; return; }
-    const D = day(); const x = D.sets[hrFor]; if(x) x.hr = v;
-    const pct = Math.round(v/maxHR()*100);
-    const zone = pct<60 ? "เบา ลองเพิ่มครั้งต่อเซ็ตได้" : pct<75 ? "ปานกลาง กำลังดี" : pct<88 ? "หนัก ดีสำหรับเผาผลาญ" : "หนักมาก ถ้าเหนื่อยเกินไปลดครั้งต่อเซ็ตลง";
-    $("hr-box").hidden = true; hrFor = null;
-    $("sync").textContent = "ชีพจร "+v+" bpm = "+pct+"% ของสูงสุด · "+zone;
-    render(); scheduleSave(todayKey(), true);
-  }
-
-  // ---- live heart rate over Bluetooth (standard Heart Rate service; Chrome on Android/desktop)
-  let liveHR = null, peakHR = null, hrDevice = null;
-  function onHR(e){
-    const v = e.target.value, flags = v.getUint8(0);
-    const bpm = (flags & 1) ? v.getUint16(1, true) : v.getUint8(1);
-    if(!bpm) return;
-    liveHR = bpm; if(day().cur > 0) peakHR = Math.max(peakHR||0, bpm);
-    $("w-t").textContent = "♥ "+bpm+" bpm"; $("w-s").textContent = "เชื่อมแล้ว · "+Math.round(bpm/maxHR()*100)+"% ของชีพจรสูงสุด";
-  }
-  $("w-btn").addEventListener("click", async ()=>{
-    if(!navigator.bluetooth){ $("w-s").textContent = "เบราว์เซอร์นี้เชื่อมบลูทูธไม่ได้ (iPhone ใช้ไม่ได้ ใช้ Chrome บน Android หรือแอป Bluefy บน iPhone) ให้พิมพ์ชีพจรเองหลังจบเซ็ตแทน"; return; }
-    try{
-      $("w-s").textContent = "กำลังค้นหานาฬิกา…";
-      hrDevice = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:["heart_rate"]});
-      hrDevice.addEventListener("gattserverdisconnected", ()=>{ liveHR=null; $("w-t").textContent="ชีพจรสดจากนาฬิกา"; $("w-s").textContent="หลุดการเชื่อมต่อ กดเชื่อมใหม่ได้"; $("w-btn").textContent="เชื่อม"; });
-      const server = await hrDevice.gatt.connect();
-      const ch = await (await server.getPrimaryService("heart_rate")).getCharacteristic("heart_rate_measurement");
-      ch.addEventListener("characteristicvaluechanged", onHR); await ch.startNotifications();
-      $("w-btn").textContent = "เชื่อมแล้ว"; $("w-s").textContent = "รอค่าชีพจร…";
-    }catch(err){ $("w-s").textContent = (err && err.name==="NotFoundError" && /service/i.test(err.message||"")) ? "อุปกรณ์นี้ไม่ได้ส่งชีพจร เปิด HR Data Broadcasts บนนาฬิกาแล้วเลือกใหม่" : "เชื่อมไม่สำเร็จ เปิด Settings > HR Data Broadcasts บนนาฬิกาแล้วลองใหม่"; }
-  });
-
-  function finishSet(auto){
-    const D = day(); if(D.cur <= 0) return;
-    D.sets.push({t: nowHM(), n: D.cur}); D.cur = 0; delete D.target;
-    chime(); buzz([30,60,30]);
-    if(auto) say("ครบเซ็ต");
-    render(); scheduleSave(todayKey(), true);
-    askHR(D.sets.length-1);
-    const auto2 = peakHR || liveHR; peakHR = null;
-    if(auto2){ $("hr-in").value = auto2; $("hr-zone").textContent = "เติมจากนาฬิกาให้แล้ว (สูงสุดระหว่างเซ็ต) กดบันทึกได้เลย"; }
-  }
-
-  function add(n){
-    const k = todayKey(), D = day(k);
-    if(n < 0 && D.cur <= 0) return;
-    D.cur = Math.max(0, D.cur + n);
-    buzz(n>0?15:[10,40,10]);
-    if(n > 0 && D.cur >= curTarget()) { finishSet(true); stopPace(true); return; }
-    render(); scheduleSave(k);
-  }
-  function changeTarget(delta){
-    const D = day(); const v = curTarget() + delta;
-    if(v < 1) return;
-    D.target = v;
-    if(D.cur > 0 && D.cur >= v){ stopPace(true); finishSet(false); return; }
-    render(); scheduleSave(todayKey());
-  }
-
-  // ---- audio
-  let ac = null;
-  function audio(){ if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(ac && ac.state==="suspended") ac.resume(); return ac; }
-  function beep(freq, dur){
-    const a = audio(); if(!a) return;
-    const o=a.createOscillator(), g=a.createGain(); o.frequency.value=freq; o.type="sine";
-    g.gain.setValueAtTime(0.0001,a.currentTime); g.gain.exponentialRampToValueAtTime(0.35,a.currentTime+0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+dur); o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime+dur+0.02);
-  }
-  let thaiVoice = null;
-  function pickVoice(){ try{ thaiVoice = (speechSynthesis.getVoices()||[]).find(v=>/^th/i.test(v.lang))||null; }catch(e){} }
-  try{ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }catch(e){}
-  function say(text){ if(!thaiVoice) return; try{ const u=new SpeechSynthesisUtterance(text); u.voice=thaiVoice; u.lang=thaiVoice.lang; u.rate=1.1; speechSynthesis.speak(u);}catch(e){} }
-
-  let paceTimer = null, preTimer = null, wake = null, sessionReps = 0;
-  function startPace(){
-    if(paceTimer || preTimer) return; audio(); sessionReps = 0; $("hr-box").hidden = true;
-    try{ navigator.wakeLock && navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{}); }catch(e){}
-    let c = 3; $("cue").textContent = c;
-    preTimer = setInterval(()=>{ c--; if(c>0){ $("cue").textContent=c; beep(660,.08);} else { clearInterval(preTimer); preTimer=null; run(); } }, 800);
-    function run(){
-      let half = false; const ms = settings.pace*1000/2;
-      const step = () => {
-        if(!half){ $("cue").textContent="ลง ↓"; beep(330,.18); }
-        else { $("cue").textContent="ขึ้น ↑"; beep(660,.12); sessionReps++;
-          const c2 = day().cur + 1; if(c2 % 10 === 0 && c2 < curTarget()) say(String(c2));
-          add(1); }
-        half = !half;
-      };
-      step(); paceTimer = setInterval(step, ms);
-    }
-  }
-  function stopPace(done){
-    const wasRunning = paceTimer || preTimer;
-    clearInterval(paceTimer); clearInterval(preTimer); paceTimer=null; preTimer=null;
-    if(wasRunning || done) $("cue").textContent = done ? "ครบเซ็ตแล้ว พักก่อน" : (sessionReps ? "หยุดที่ "+day().cur+" ครั้ง" : "พร้อม");
-    try{ wake && wake.release(); }catch(e){} wake=null;
-  }
-
-  // ---- wire up
-  $("tap").addEventListener("click", ()=>add(1));
-  $("minus").addEventListener("click", ()=>add(-1));
-  $("plus5").addEventListener("click", ()=>add(5));
-  $("plus10").addEventListener("click", ()=>add(10));
-  $("finish").addEventListener("click", ()=>{ stopPace(); finishSet(false); });
-  $("t-minus").addEventListener("click", ()=>changeTarget(-5));
-  $("t-plus").addEventListener("click", ()=>changeTarget(5));
-  $("pace-start").addEventListener("click", startPace);
-  $("pace-stop").addEventListener("click", ()=>stopPace(false));
-  $("hr-save").addEventListener("click", saveHR);
-  $("hr-in").addEventListener("keydown", e=>{ if(e.key==="Enter") saveHR(); });
-  $("hr-skip").addEventListener("click", ()=>{ $("hr-box").hidden = true; hrFor = null; });
-  let undoArmed = null;
-  $("undo-set").addEventListener("click", ()=>{
-    const b = $("undo-set");
-    if(!undoArmed){ b.textContent = "แตะอีกครั้งเพื่อยืนยันการลบ"; undoArmed = setTimeout(()=>{ undoArmed=null; b.textContent="ลบเซ็ตล่าสุด"; }, 3000); return; }
-    clearTimeout(undoArmed); undoArmed = null; b.textContent = "ลบเซ็ตล่าสุด";
-    day().sets.pop(); $("hr-box").hidden = true; render(); scheduleSave(todayKey(), true);
-  });
-  function tab(which){
-    const pace = which==="pace";
-    $("tab-tap").setAttribute("aria-selected", String(!pace)); $("tab-pace").setAttribute("aria-selected", String(pace));
-    $("mode-tap").hidden = pace; $("mode-pace").hidden = !pace;
-    if(!pace) stopPace(false);
-    try{ localStorage.setItem(LS+".tab", which); }catch(e){}
-  }
-  $("tab-tap").addEventListener("click", ()=>tab("tap"));
-  $("tab-pace").addEventListener("click", ()=>tab("pace"));
-
-  const numFields = {weight:"s-weight", height:"s-height", age:"s-age", goal:"s-goal", per:"s-per", pace:"s-pace", met:"s-met", every:"s-every"};
-  const intKeys = new Set(["age","goal","per","every"]);
-  function fillForm(){ for(const [k,id] of Object.entries(numFields)) $(id).value = settings[k]; $("s-from").value=settings.from; $("s-to").value=settings.to; $("s-sex").value=settings.sex; }
-  $("s-sex").addEventListener("change", ()=>{ settings.sex = $("s-sex").value==="f" ? "f" : "m"; render(); scheduleSave(); });
-  for(const [k,id] of Object.entries(numFields)){
-    $(id).addEventListener("change", ()=>{
-      const v = parseFloat($(id).value);
-      if(isFinite(v) && v>0){ settings[k] = intKeys.has(k) ? Math.max(1,Math.round(v)) : v; settingsDirty = true; render(); scheduleSave(); }
-      else $(id).value = settings[k];
-    });
-  }
-  for(const k of ["from","to"]) $("s-"+k).addEventListener("change", ()=>{ const v=$("s-"+k).value; if(toMin(v)!=null){ settings[k]=v; settingsDirty=true; render(); scheduleSave(); } });
-
-  const dateLabel = () => $("today-label").textContent = new Date().toLocaleDateString("th-TH",{weekday:"long", day:"numeric", month:"short"});
-  dateLabel(); lsLoad(); fillForm(); render();
-  try{ if(localStorage.getItem(LS+".tab")==="pace") tab("pace"); }catch(e){}
-  $("sync").textContent = "บันทึกไว้ในเครื่องนี้";
-  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ dateLabel(); render(); } });
-  setInterval(renderNext, 30000);
-
-  // ---- VO2 max (Uth–Sørensen 2004) with rough age/sex bands
   const VO2B = {m:[[29,38,42,46,52],[39,36,40,44,50],[49,34,38,42,48],[59,31,35,39,45],[200,28,32,36,42]],
                 f:[[29,32,36,40,45],[39,30,34,38,43],[49,28,32,36,41],[59,25,29,33,38],[200,23,27,31,36]]};
   const VO2L = ["ต่ำ","พอใช้","ดี","ดีมาก","ยอดเยี่ยม"];
   function renderVO2(){
     const r = settings.restHR;
-    if(!r){ $("vo2").textContent="–"; $("vo2-band").textContent="ใส่ชีพจรขณะพัก"; return; }
-    const hrmax = 208 - 0.7*settings.age, v = 15.3*hrmax/r;
+    if(!r){ $("vo2").textContent="–"; $("vo2-band").textContent="–"; return; }
+    const v = 15.3*(208 - 0.7*settings.age)/r;
     $("vo2").textContent = fmt(v,1); $("rhr-in").value = r;
-    const row = (VO2B[settings.sex==="f"?"f":"m"]).find(x=>settings.age<=x[0]);
+    const row = VO2B[settings.sex==="f"?"f":"m"].find(x=>settings.age<=x[0]);
     let k=0; while(k<4 && v>=row[k+1]) k++;
     $("vo2-band").textContent = VO2L[k];
-    $("vo2-cmp").textContent = "เทียบ"+(settings.sex==="f"?"ผู้หญิง":"ผู้ชาย")+" อายุ "+settings.age+" ปี (ชีพจรพัก "+r+")";
+    $("vo2-cmp").textContent = "เทียบ"+(settings.sex==="f"?"ผู้หญิง":"ผู้ชาย")+" "+settings.age+" ปี · ชีพจรพัก "+r;
   }
-  function saveRHR(){
-    const v = parseInt($("rhr-in").value,10);
-    if(!(v>=30 && v<=120)){ $("vo2-band").textContent="ใส่ 30–120"; return; }
-    settings.restHR = v; lsSave(); renderVO2();
-  }
-  $("rhr-save").addEventListener("click", saveRHR);
-  $("rhr-in").addEventListener("keydown", e=>{ if(e.key==="Enter") saveRHR(); });
-  const _render = render; render = function(){ _render(); renderVO2(); };
-  renderVO2();
 
-  // ---- first run
-  let oSex = "m";
-  $("o-m").addEventListener("click", ()=>{ oSex="m"; $("o-m").setAttribute("aria-pressed","true"); $("o-f").setAttribute("aria-pressed","false"); });
-  $("o-f").addEventListener("click", ()=>{ oSex="f"; $("o-f").setAttribute("aria-pressed","true"); $("o-m").setAttribute("aria-pressed","false"); });
-  $("o-go").addEventListener("click", ()=>{
-    const w=parseFloat($("o-weight").value), h=parseFloat($("o-height").value), a=parseInt($("o-age").value,10), g=parseInt($("o-goal").value,10)||100;
-    if(!(w>=30&&w<=250)) return void($("o-err").textContent="ใส่น้ำหนักระหว่าง 30–250 กก.");
-    if(!(h>=100&&h<=230)) return void($("o-err").textContent="ใส่ส่วนสูงระหว่าง 100–230 ซม.");
-    if(!(a>=12&&a<=90)) return void($("o-err").textContent="ใส่อายุระหว่าง 12–90 ปี");
-    settings = {...settings, weight:w, height:h, age:a, sex:oSex, goal:Math.max(10,g), per:Math.max(1,Math.round(Math.max(10,g)/4)), onboarded:true};
-    lsSave(); fillForm(); render(); $("onb").hidden = true; window.scrollTo(0,0);
+  // ---- sound
+  function buzz(p){ if(settings.vibe && navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
+  let ac = null;
+  function audio(){ if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(ac && ac.state==="suspended") ac.resume(); return ac; }
+  function beep(freq, dur){
+    if(!settings.sound) return; const a = audio(); if(!a) return;
+    const o=a.createOscillator(), g=a.createGain(); o.frequency.value=freq; o.type="sine";
+    g.gain.setValueAtTime(0.0001,a.currentTime); g.gain.exponentialRampToValueAtTime(0.35,a.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+dur); o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime+dur+0.02);
+  }
+  function chime(){ beep(880,.15); setTimeout(()=>beep(1175,.25),170); }
+  let thaiVoice = null;
+  function pickVoice(){ try{ thaiVoice = (speechSynthesis.getVoices()||[]).find(v=>/^th/i.test(v.lang))||null; }catch(e){} }
+  try{ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }catch(e){}
+  function say(text){ if(!settings.voice || !thaiVoice) return; try{ const u=new SpeechSynthesisUtterance(text); u.voice=thaiVoice; u.lang=thaiVoice.lang; u.rate=1.1; speechSynthesis.speak(u);}catch(e){} }
+
+  // ---- counting
+  function finishSet(auto){
+    const D = day(); if(D.cur <= 0) return;
+    D.sets.push({t: nowHM(), n: D.cur}); D.cur = 0; delete D.target;
+    chime(); buzz([30,60,30]); if(auto) say("ครบเซ็ต");
+    save(); render();
+    const auto2 = peakHR || liveHR; peakHR = null;
+    if(auto2){ D.sets[D.sets.length-1].hr = auto2; save(); render(); toast("บันทึกชีพจร "+auto2+" bpm จากนาฬิกาแล้ว"); }
+    else if(settings.askHR) askHR(D.sets.length-1);
+    else toast("บันทึกเซ็ตแล้ว");
+  }
+  function add(n){
+    const D = day();
+    if(n < 0 && D.cur <= 0) return;
+    D.cur = Math.max(0, D.cur + n); buzz(n>0?15:[10,40,10]);
+    if(n > 0 && D.cur >= curTarget()){ stopPace(true); finishSet(true); return; }
+    save(); render();
+  }
+  function changeTarget(delta){
+    const D = day(), v = curTarget() + delta; if(v < 1) return;
+    D.target = v;
+    if(D.cur > 0 && D.cur >= v){ stopPace(true); finishSet(false); return; }
+    save(); render();
+  }
+
+  // ---- heart-rate sheet
+  let hrFor = null;
+  function askHR(idx){ hrFor = idx; $("hr-in").value=""; $("hr-zone").textContent="ดูตัวเลขหัวใจบนนาฬิกาแล้วพิมพ์ · ชีพจรสูงสุดของคุณประมาณ "+maxHR(); $("hr-sheet").hidden=false; setTimeout(()=>{ try{$("hr-in").focus();}catch(e){} },50); }
+  function closeHR(){ $("hr-sheet").hidden = true; hrFor = null; }
+  function saveHR(){
+    const v = parseInt($("hr-in").value,10);
+    if(!(v>=40 && v<=220)){ $("hr-zone").textContent="ใส่ตัวเลข 40–220"; return; }
+    const x = day().sets[hrFor]; if(x) x.hr = v;
+    const pct = Math.round(v/maxHR()*100);
+    closeHR(); save(); render();
+    toast(pct+"% ของชีพจรสูงสุด · "+(pct<60?"เบา ลองเพิ่มครั้งต่อเซ็ต":pct<75?"ปานกลาง กำลังดี":pct<88?"หนัก ดีสำหรับเผาผลาญ":"หนักมาก ลดครั้งต่อเซ็ตได้"));
+  }
+
+  // ---- pace mode
+  let paceTimer=null, preTimer=null, wake=null;
+  function startPace(){
+    if(paceTimer || preTimer) return; audio();
+    try{ navigator.wakeLock && navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{}); }catch(e){}
+    let c = 3; $("cue-t").textContent = c; $("cue-s").textContent = "เตรียมตัว";
+    preTimer = setInterval(()=>{ c--; if(c>0){ $("cue-t").textContent=c; beep(660,.08);} else { clearInterval(preTimer); preTimer=null; run(); } }, 800);
+    function run(){
+      let half=false;
+      const step = () => {
+        if(!half){ $("cue-t").textContent="ลง ↓"; beep(330,.18); }
+        else { $("cue-t").textContent="ขึ้น ↑"; beep(660,.12); const c2 = day().cur+1; if(c2%10===0 && c2<curTarget()) say(String(c2)); add(1); }
+        $("cue-s").textContent = day().cur+" / "+curTarget(); half=!half;
+      };
+      step(); paceTimer = setInterval(step, settings.pace*500);
+    }
+  }
+  function stopPace(done){
+    const was = paceTimer || preTimer;
+    clearInterval(paceTimer); clearInterval(preTimer); paceTimer=null; preTimer=null;
+    if(was || done){ $("cue-t").textContent = done ? "ครบเซ็ต" : "หยุด"; $("cue-s").textContent = done ? "พักก่อนแล้วค่อยทำเซ็ตต่อไป" : "ทำไป "+day().cur+" ครั้ง กดเริ่มเพื่อทำต่อ"; }
+    try{ wake && wake.release(); }catch(e){} wake=null;
+  }
+  function mode(m){
+    const pace = m==="pace";
+    $("m-tap").setAttribute("aria-pressed", String(!pace)); $("m-pace").setAttribute("aria-pressed", String(pace));
+    $("tap").hidden = pace; $("tap-row").hidden = pace; $("cue").hidden = !pace; $("pace-row").hidden = !pace;
+    if(!pace) stopPace(false);
+    try{ localStorage.setItem(LS+".mode", m); }catch(e){}
+  }
+
+  // ---- watch (Bluetooth heart rate service)
+  let liveHR=null, peakHR=null;
+  $("w-btn").addEventListener("click", async ()=>{
+    if(!navigator.bluetooth){ $("w-s").textContent = "เบราว์เซอร์นี้เชื่อมบลูทูธไม่ได้ · iPhone ใช้แอป Bluefy · Android ใช้ Chrome"; return; }
+    try{
+      $("w-s").textContent = "กำลังค้นหานาฬิกา…";
+      const dev = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:["heart_rate"]});
+      dev.addEventListener("gattserverdisconnected", ()=>{ liveHR=null; $("w-t").textContent="ชีพจรสดผ่านบลูทูธ"; $("w-s").textContent="หลุดการเชื่อมต่อ กดเชื่อมใหม่ได้"; $("w-btn").textContent="เชื่อม"; render(); });
+      const server = await dev.gatt.connect();
+      const ch = await (await server.getPrimaryService("heart_rate")).getCharacteristic("heart_rate_measurement");
+      ch.addEventListener("characteristicvaluechanged", e=>{
+        const v=e.target.value, bpm=(v.getUint8(0)&1)?v.getUint16(1,true):v.getUint8(1); if(!bpm) return;
+        liveHR=bpm; if(day().cur>0) peakHR=Math.max(peakHR||0,bpm);
+        $("w-t").textContent="♥ "+bpm+" bpm"; $("hr-now").textContent=bpm; $("hr-lbl").textContent="bpm สด";
+      });
+      await ch.startNotifications(); $("w-btn").textContent="เชื่อมแล้ว"; $("w-s").textContent="จบเซ็ตแล้วแอปบันทึกชีพจรสูงสุดให้เอง";
+    }catch(err){ $("w-s").textContent = "เชื่อมไม่สำเร็จ · เปิด Settings > HR Data Broadcasts บนนาฬิกาแล้วลองใหม่"; }
   });
-  if(!settings.onboarded) $("onb").hidden = false;
-  $("sync").textContent = "ข้อมูลเก็บในมือถือเครื่องนี้เท่านั้น";
 
-  // ---- calendar reminders (.ics with a daily repeating event per slot)
+  // ---- settings controls
+  const ranges = {weight:[1,"r-weight","v-weight"], height:[0,"r-height","v-height"], age:[0,"r-age","v-age"], goal:[0,"r-goal","v-goal"], per:[0,"r-per","v-per"], pace:[1,"r-pace","v-pace"], met:[1,"r-met","v-met"]};
+  const switches = {remind:"sw-remind", sound:"sw-sound", voice:"sw-voice", vibe:"sw-vibe", askHR:"sw-askhr"};
+  function fillSettings(){
+    for(const [k,[d,r,v]] of Object.entries(ranges)){ $(r).value = settings[k]; $(v).textContent = fmt(+settings[k], d); }
+    $("v-sets").textContent = "≈ "+Math.ceil(settings.goal/settings.per)+" เซ็ตต่อวัน";
+    for(const [k,id] of Object.entries(switches)) $(id).checked = !!settings[k];
+    $("sx-m").setAttribute("aria-pressed", String(settings.sex!=="f")); $("sx-f").setAttribute("aria-pressed", String(settings.sex==="f"));
+    document.querySelectorAll("#every-seg button").forEach(b=>b.setAttribute("aria-pressed", String(+b.dataset.h===settings.every)));
+    $("s-from").value = settings.from; $("s-to").value = settings.to;
+  }
+  for(const [k,[d,r,v]] of Object.entries(ranges)){
+    $(r).addEventListener("input", ()=>{ settings[k] = d ? parseFloat($(r).value) : parseInt($(r).value,10); $(v).textContent = fmt(settings[k], d);
+      if(k==="goal"||k==="per") $("v-sets").textContent = "≈ "+Math.ceil(settings.goal/settings.per)+" เซ็ตต่อวัน"; });
+    $(r).addEventListener("change", ()=>{ save(); render(); });
+  }
+  for(const [k,id] of Object.entries(switches)) $(id).addEventListener("change", ()=>{ settings[k] = $(id).checked; save(); render(); });
+  $("sx-m").addEventListener("click", ()=>{ settings.sex="m"; fillSettings(); save(); render(); });
+  $("sx-f").addEventListener("click", ()=>{ settings.sex="f"; fillSettings(); save(); render(); });
+  document.querySelectorAll("#every-seg button").forEach(b=>b.addEventListener("click", ()=>{ settings.every=+b.dataset.h; fillSettings(); save(); render(); }));
+  for(const k of ["from","to"]) $("s-"+k).addEventListener("change", ()=>{ const v=$("s-"+k).value; if(toMin(v)!=null){ settings[k]=v; save(); render(); } });
+
   $("ics").addEventListener("click", ()=>{
     const a = toMin(settings.from), b = toMin(settings.to), step = settings.every*60;
-    if(a==null || b==null || b<=a){ $("sync").textContent = "ตั้งเวลาเริ่มให้น้อยกว่าเวลาเลิกเตือนก่อน"; return; }
+    if(a==null || b==null || b<=a){ toast("ตั้งเวลาเริ่มให้น้อยกว่าเวลาเลิกเตือนก่อน"); return; }
     const d = new Date(), ymd = d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
     const stamp = new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
-    const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Squat100//TH","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
-    let i = 0;
+    const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Squat100//TH","CALSCALE:GREGORIAN","METHOD:PUBLISH"]; let i=0;
     for(let m=a; m<=b; m+=step){
-      const hh=pad(Math.floor(m/60)), mm=pad(m%60), end=m+5, eh=pad(Math.floor(end/60)), em=pad(end%60);
-      lines.push("BEGIN:VEVENT","UID:squat100-"+ymd+"-"+(i++)+"-"+Math.random().toString(36).slice(2,8)+"@squat100","DTSTAMP:"+stamp,
-        "DTSTART:"+ymd+"T"+hh+mm+"00","DTEND:"+ymd+"T"+eh+em+"00","RRULE:FREQ=DAILY",
-        "SUMMARY:สควอต "+settings.per+" ครั้ง (Squat 100)","DESCRIPTION:ถึงเวลาสควอตเซ็ตถัดไป เปิดแอป Squat 100 เพื่อนับ",
+      const e=m+5;
+      L.push("BEGIN:VEVENT","UID:squat100-"+ymd+"-"+(i++)+"-"+Math.random().toString(36).slice(2,8)+"@squat100","DTSTAMP:"+stamp,
+        "DTSTART:"+ymd+"T"+pad(Math.floor(m/60))+pad(m%60)+"00","DTEND:"+ymd+"T"+pad(Math.floor(e/60))+pad(e%60)+"00","RRULE:FREQ=DAILY",
+        "SUMMARY:สควอต "+settings.per+" ครั้ง (Squat 100)","DESCRIPTION:ถึงเวลาสควอตเซ็ตถัดไป",
         "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:ถึงเวลาสควอตแล้ว","TRIGGER:PT0M","END:VALARM","END:VEVENT");
     }
-    lines.push("END:VCALENDAR");
-    const blob = new Blob([lines.join("\r\n")], {type:"text/calendar"});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a"); link.href = url; link.download = "squat100-reminders.ics";
-    document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url), 10000);
-    $("sync").textContent = "เปิดไฟล์ที่ดาวน์โหลดแล้วเลือก \"เพิ่มทั้งหมด\" ลงปฏิทิน ("+i+" นัดต่อวัน)";
+    L.push("END:VCALENDAR");
+    const url = URL.createObjectURL(new Blob([L.join("\r\n")], {type:"text/calendar"}));
+    const link = document.createElement("a"); link.href=url; link.download="squat100-reminders.ics"; document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 10000);
+    toast("เปิดไฟล์แล้วเลือก \"เพิ่มทั้งหมด\" ลงปฏิทิน ("+i+" นัดต่อวัน)");
   });
-
-  // ---- reset
-  let resetArmed = null;
+  let resetArmed=null;
   $("reset").addEventListener("click", ()=>{
     const b=$("reset");
-    if(!resetArmed){ b.textContent="แตะอีกครั้งเพื่อยืนยัน"; resetArmed=setTimeout(()=>{resetArmed=null; b.textContent="ล้างข้อมูลทั้งหมด";},3000); return; }
-    clearTimeout(resetArmed); try{ localStorage.removeItem(LS); localStorage.removeItem(LS+".tab"); }catch(e){} location.reload();
+    if(!resetArmed){ b.lastChild.textContent="แตะอีกครั้งเพื่อยืนยัน"; resetArmed=setTimeout(()=>{ resetArmed=null; b.lastChild.textContent="ล้างข้อมูลทั้งหมด"; },3000); return; }
+    clearTimeout(resetArmed); try{ localStorage.removeItem(LS); localStorage.removeItem(LS+".mode"); }catch(e){} location.hash=""; location.reload();
   });
+
+  // ---- VO2
+  function saveRHR(){ const v=parseInt($("rhr-in").value,10); if(!(v>=30&&v<=120)){ toast("ใส่ชีพจรขณะพัก 30–120"); return; } settings.restHR=v; save(); renderVO2(); }
+  $("rhr-save").addEventListener("click", saveRHR);
+  $("rhr-in").addEventListener("keydown", e=>{ if(e.key==="Enter") saveRHR(); });
+
+  // ---- wiring
+  $("tap").addEventListener("click", ()=>add(1));
+  $("minus").addEventListener("click", ()=>add(-1));
+  $("plus5").addEventListener("click", ()=>add(5));
+  $("plus10").addEventListener("click", ()=>add(10));
+  $("finish").addEventListener("click", ()=>finishSet(false));
+  $("finish2").addEventListener("click", ()=>{ stopPace(false); finishSet(false); });
+  $("t-minus").addEventListener("click", ()=>changeTarget(-5));
+  $("t-plus").addEventListener("click", ()=>changeTarget(5));
+  $("m-tap").addEventListener("click", ()=>mode("tap"));
+  $("m-pace").addEventListener("click", ()=>mode("pace"));
+  $("pace-start").addEventListener("click", startPace);
+  $("pace-stop").addEventListener("click", ()=>stopPace(false));
+  $("hr-save").addEventListener("click", saveHR);
+  $("hr-in").addEventListener("keydown", e=>{ if(e.key==="Enter") saveHR(); });
+  $("hr-skip").addEventListener("click", closeHR);
+  let undoArmed=null;
+  $("undo-set").addEventListener("click", ()=>{
+    const b=$("undo-set");
+    if(!undoArmed){ b.textContent="แตะอีกครั้งเพื่อลบเซ็ตล่าสุด"; undoArmed=setTimeout(()=>{ undoArmed=null; b.textContent="ลบเซ็ตล่าสุด"; },3000); return; }
+    clearTimeout(undoArmed); undoArmed=null; b.textContent="ลบเซ็ตล่าสุด"; day().sets.pop(); save(); render();
+  });
+
+  // ---- pages
+  function route(){
+    const p = (location.hash||"#today").slice(1), page = ["today","stats","settings"].includes(p) ? p : "today";
+    for(const x of ["today","stats","settings"]){ $("pg-"+x).hidden = x!==page; if(x===page) $("tab-"+x).setAttribute("aria-current","page"); else $("tab-"+x).removeAttribute("aria-current"); }
+    if(page!=="today") stopPace(false);
+    window.scrollTo(0,0);
+  }
+  window.addEventListener("hashchange", route);
+
+  // ---- first run
+  let oSex="m";
+  $("o-m").addEventListener("click", ()=>{ oSex="m"; $("o-m").setAttribute("aria-pressed","true"); $("o-f").setAttribute("aria-pressed","false"); });
+  $("o-f").addEventListener("click", ()=>{ oSex="f"; $("o-f").setAttribute("aria-pressed","true"); $("o-m").setAttribute("aria-pressed","false"); });
+  for(const k of ["weight","height","age","goal"]) $("o-"+k).addEventListener("input", ()=>$("ov-"+k).textContent = $("o-"+k).value);
+  $("o-go").addEventListener("click", ()=>{
+    const g = parseInt($("o-goal").value,10);
+    settings = {...settings, weight:parseFloat($("o-weight").value), height:parseInt($("o-height").value,10), age:parseInt($("o-age").value,10), sex:oSex, goal:g, per:Math.max(5, Math.round(g/4/5)*5), onboarded:true};
+    save(); fillSettings(); render(); $("onb").hidden = true;
+  });
+
+  // ---- start
+  $("today-label").textContent = new Date().toLocaleDateString("th-TH",{weekday:"short", day:"numeric", month:"short"});
+  lsLoad(); fillSettings(); render(); route();
+  try{ if(localStorage.getItem(LS+".mode")==="pace") mode("pace"); }catch(e){}
+  if(!settings.onboarded) $("onb").hidden = false;
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) render(); });
+  setInterval(renderNext, 30000);
 })();
 </script>
 </body>

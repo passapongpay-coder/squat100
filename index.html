@@ -489,13 +489,13 @@ details summary{cursor:pointer;font-family:var(--display);font-size:16px}
     if(!navigator.bluetooth){ $("w-s").textContent = "เบราว์เซอร์นี้เชื่อมบลูทูธไม่ได้ (iPhone ใช้ไม่ได้ ใช้ Chrome บน Android หรือแอป Bluefy บน iPhone) ให้พิมพ์ชีพจรเองหลังจบเซ็ตแทน"; return; }
     try{
       $("w-s").textContent = "กำลังค้นหานาฬิกา…";
-      hrDevice = await navigator.bluetooth.requestDevice({filters:[{services:["heart_rate"]}]});
+      hrDevice = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:["heart_rate"]});
       hrDevice.addEventListener("gattserverdisconnected", ()=>{ liveHR=null; $("w-t").textContent="ชีพจรสดจากนาฬิกา"; $("w-s").textContent="หลุดการเชื่อมต่อ กดเชื่อมใหม่ได้"; $("w-btn").textContent="เชื่อม"; });
       const server = await hrDevice.gatt.connect();
       const ch = await (await server.getPrimaryService("heart_rate")).getCharacteristic("heart_rate_measurement");
       ch.addEventListener("characteristicvaluechanged", onHR); await ch.startNotifications();
       $("w-btn").textContent = "เชื่อมแล้ว"; $("w-s").textContent = "รอค่าชีพจร…";
-    }catch(err){ $("w-s").textContent = "เชื่อมไม่สำเร็จ เช็กว่าเปิดแชร์ข้อมูลชีพจรบนนาฬิกาแล้วลองใหม่"; }
+    }catch(err){ $("w-s").textContent = (err && err.name==="NotFoundError" && /service/i.test(err.message||"")) ? "อุปกรณ์นี้ไม่ได้ส่งชีพจร เปิด HR Data Broadcasts บนนาฬิกาแล้วเลือกใหม่" : "เชื่อมไม่สำเร็จ เปิด Settings > HR Data Broadcasts บนนาฬิกาแล้วลองใหม่"; }
   });
 
   function finishSet(auto){

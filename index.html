@@ -270,6 +270,19 @@ details summary{cursor:pointer;font-family:var(--display);font-size:16px}
     <p class="hint" style="margin-top:10px">ถ้าไม่ได้ใส่ชีพจร ใช้สูตร MET (ค่าเดา MET 5.0, 2.5 วินาที/ครั้ง) ถ้าใส่ชีพจร ใช้สูตรจากอัตราการเต้นหัวใจ (Keytel) กับน้ำหนัก อายุ เพศของคุณ ทั้งสองแบบเป็นค่าประมาณ อาจคลาดราว ±25%</p>
   </section>
 
+  <section class="clay" aria-label="VO2 max">
+    <h2>VO2 max (ประมาณ)</h2>
+    <div class="streakline" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <div class="stat"><div class="v num" id="vo2">–</div><div class="l">ml/kg/นาที</div></div>
+      <div class="stat"><div class="v" id="vo2-band" style="font-size:18px">–</div><div class="l" id="vo2-cmp">เทียบคนวัยเดียวกัน</div></div>
+    </div>
+    <div class="hr-row">
+      <input id="rhr-in" type="number" inputmode="numeric" min="30" max="120" placeholder="ชีพจรขณะพัก เช่น 62" aria-label="ชีพจรขณะพัก (ครั้งต่อนาที)">
+      <button class="btn mint" id="rhr-save" type="button">คำนวณ</button>
+    </div>
+    <p class="hint" style="margin-top:10px">ใส่ชีพจรขณะพัก ดูได้จากนาฬิกาตอนเช้าหลังตื่นนอน หรือในแอป Huawei Health (หัวข้ออัตราการเต้นหัวใจ > ขณะพัก) แอปใช้สูตร Uth–Sørensen: 15.3 × ชีพจรสูงสุด ÷ ชีพจรขณะพัก (ชีพจรสูงสุดประมาณจาก 208 − 0.7 × อายุ) เป็นค่าประมาณคร่าวๆ อาจคลาด ±10–15% ค่าที่แม่นกว่าดูได้ใน Huawei Health หลังวิ่งกลางแจ้งใส่นาฬิกา</p>
+  </section>
+
   <section class="clay">
     <details>
       <summary>ตั้งค่า</summary>
@@ -613,6 +626,30 @@ details summary{cursor:pointer;font-family:var(--display);font-size:16px}
   $("sync").textContent = "บันทึกไว้ในเครื่องนี้";
   document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ dateLabel(); render(); } });
   setInterval(renderNext, 30000);
+
+  // ---- VO2 max (Uth–Sørensen 2004) with rough age/sex bands
+  const VO2B = {m:[[29,38,42,46,52],[39,36,40,44,50],[49,34,38,42,48],[59,31,35,39,45],[200,28,32,36,42]],
+                f:[[29,32,36,40,45],[39,30,34,38,43],[49,28,32,36,41],[59,25,29,33,38],[200,23,27,31,36]]};
+  const VO2L = ["ต่ำ","พอใช้","ดี","ดีมาก","ยอดเยี่ยม"];
+  function renderVO2(){
+    const r = settings.restHR;
+    if(!r){ $("vo2").textContent="–"; $("vo2-band").textContent="ใส่ชีพจรขณะพัก"; return; }
+    const hrmax = 208 - 0.7*settings.age, v = 15.3*hrmax/r;
+    $("vo2").textContent = fmt(v,1); $("rhr-in").value = r;
+    const row = (VO2B[settings.sex==="f"?"f":"m"]).find(x=>settings.age<=x[0]);
+    let k=0; while(k<4 && v>=row[k+1]) k++;
+    $("vo2-band").textContent = VO2L[k];
+    $("vo2-cmp").textContent = "เทียบ"+(settings.sex==="f"?"ผู้หญิง":"ผู้ชาย")+" อายุ "+settings.age+" ปี (ชีพจรพัก "+r+")";
+  }
+  function saveRHR(){
+    const v = parseInt($("rhr-in").value,10);
+    if(!(v>=30 && v<=120)){ $("vo2-band").textContent="ใส่ 30–120"; return; }
+    settings.restHR = v; lsSave(); renderVO2();
+  }
+  $("rhr-save").addEventListener("click", saveRHR);
+  $("rhr-in").addEventListener("keydown", e=>{ if(e.key==="Enter") saveRHR(); });
+  const _render = render; render = function(){ _render(); renderVO2(); };
+  renderVO2();
 
   // ---- first run
   let oSex = "m";

@@ -209,7 +209,7 @@ details summary{cursor:pointer;font-size:13.5px;color:var(--ink)}
         <button class="btn round" id="t-plus" type="button" aria-label="เพิ่มจำนวนครั้งของเซ็ตนี้">+</button>
       </div>
       <button class="tap" id="tap" type="button"><span class="p1" id="tap-n">0</span><span class="p2">แตะ +1 ทุกครั้งที่ยืนขึ้น</span><span class="bar"><i id="tap-bar"></i></span></button>
-      <div class="cue well" id="cue" hidden><span class="big" id="cue-t">พร้อม</span><span class="sm" id="cue-s">ใส่ AirPods แล้วกดเริ่ม · เสียงต่ำ = ลง · เสียงสูง = ขึ้น</span></div>
+      <div class="cue well" id="cue" hidden><span class="big" id="cue-t">พร้อม</span><span class="sm" id="cue-s">เปิดเสียงลำโพงมือถือหรือใส่หูฟังก็ได้ · เสียงต่ำ = ลง · เสียงสูง = ขึ้น</span></div>
       <div class="row" id="tap-row">
         <button class="btn" id="minus" type="button">−1</button>
         <button class="btn" id="plus5" type="button">+5</button>
@@ -586,11 +586,11 @@ details summary{cursor:pointer;font-size:13.5px;color:var(--ink)}
   // ---- sound
   function buzz(p){ if(settings.vibe && navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
   let ac = null;
-  function audio(){ if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(ac && ac.state==="suspended") ac.resume(); return ac; }
+  function audio(){ try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){} if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(ac && ac.state==="suspended") ac.resume(); return ac; }
   function beep(freq, dur){
     if(!settings.sound) return; const a = audio(); if(!a) return;
-    const o=a.createOscillator(), g=a.createGain(); o.frequency.value=freq; o.type="sine";
-    g.gain.setValueAtTime(0.0001,a.currentTime); g.gain.exponentialRampToValueAtTime(0.35,a.currentTime+0.01);
+    const o=a.createOscillator(), g=a.createGain(); o.frequency.value=freq; o.type="triangle";
+    g.gain.setValueAtTime(0.0001,a.currentTime); g.gain.exponentialRampToValueAtTime(0.8,a.currentTime+0.01);
     g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+dur); o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime+dur+0.02);
   }
   function chime(){ beep(880,.15); setTimeout(()=>beep(1175,.25),170); }

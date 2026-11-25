@@ -341,7 +341,7 @@ details summary{cursor:pointer;font-size:13.5px;color:var(--ink)}
       <div class="item"><button class="btn" id="reset" type="button"><svg class="ic sm"><use href="#i-trash-can"/></svg>ล้างข้อมูลทั้งหมด</button><span class="sub">ข้อมูลเก็บในมือถือเครื่องนี้เท่านั้น ล้างแล้วกู้คืนไม่ได้</span></div>
     </div>
     <div class="clay group" id="donate-box" hidden>
-      <div class="item"><div class="top"><span class="name">ชอบแอปนี้? เลี้ยงกาแฟคนทำได้นะ</span><a class="btn coral" id="donate" href="#" target="_blank" rel="noopener" style="flex:none;padding-inline:16px;text-decoration:none"><svg class="ic sm"><use href="#i-heart"/></svg>สนับสนุน</a></div></div>
+      <div class="item"><div class="top"><span class="name">ชอบแอปนี้? เลี้ยงกาแฟคนทำได้นะ</span><button class="btn coral" id="donate" type="button" style="flex:none;padding-inline:16px"><svg class="ic sm"><use href="#i-heart"/></svg>สนับสนุน</button></div></div>
     </div>
     <p class="credit">Icons by <a href="https://iconsaga.com" target="_blank" rel="noopener">IconSaga · iconsaga.com</a></p>
   </section>
@@ -382,6 +382,15 @@ details summary{cursor:pointer;font-size:13.5px;color:var(--ink)}
   </div>
 </section>
 
+<div class="scrim" id="qr-sheet" hidden>
+  <div class="clay sheet" role="dialog" aria-modal="true" aria-labelledby="qr-q" style="align-items:center;text-align:center">
+    <div class="q" id="qr-q"><svg class="ic"><use href="#i-heart"/></svg>ขอบคุณที่สนับสนุน</div>
+    <img id="qr-img" alt="QR พร้อมเพย์สำหรับโดเนท" style="width:min(260px,70vw);height:auto;border-radius:16px;background:#fff;padding:8px">
+    <span class="muted" style="font-size:13px">เปิดแอปธนาคาร > สแกน แล้วใส่จำนวนเงินตามสะดวก · บนมือถือกดค้างที่รูปเพื่อบันทึก แล้วเลือกรูปจากแอปธนาคาร</span>
+    <button class="btn" id="qr-close" type="button" style="width:100%">ปิด</button>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -392,7 +401,7 @@ details summary{cursor:pointer;font-size:13.5px;color:var(--ink)}
   let days = {};
   let weights = [];
   const LS = "squat100.web.v1";
-  const DONATE_URL = ""; // e.g. https://ko-fi.com/yourname — the support button stays hidden until this is set
+  const DONATE_QR = ""; // e.g. "donate-qr.png" — the support button stays hidden until a PromptPay QR image is added
 
   const $ = id => document.getElementById(id);
   const pad = n => String(n).padStart(2,"0");
@@ -777,7 +786,9 @@ details summary{cursor:pointer;font-size:13.5px;color:var(--ink)}
 
   // ---- start
   $("today-label").textContent = new Date().toLocaleDateString("th-TH",{weekday:"short", day:"numeric", month:"short"});
-  if(DONATE_URL){ $("donate").href = DONATE_URL; $("donate-box").hidden = false; }
+  if(DONATE_QR){ $("donate-box").hidden = false;
+    $("donate").addEventListener("click", ()=>{ $("qr-img").src = DONATE_QR; $("qr-sheet").hidden = false; });
+    $("qr-close").addEventListener("click", ()=>$("qr-sheet").hidden = true); }
   lsLoad(); fillSettings(); render(); route();
   try{ if(localStorage.getItem(LS+".mode")==="pace") mode("pace"); }catch(e){}
   if(!settings.onboarded) $("onb").hidden = false;

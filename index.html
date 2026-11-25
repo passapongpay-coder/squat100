@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Squat 100</title>
+<meta name="description" content="นับสควอตวันละ 100 ครั้ง แบ่งเป็นเซ็ต คำนวณแคลอรี่ ข้อมูลเก็บในมือถือคุณเท่านั้น">
+<meta name="theme-color" content="#E4ECF6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Squat 100">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap">
+<style>
+/* Layout: one phone column of soft clay blocks — ring, next-set reminder, sets, big clay tap button, stats, calories, settings */
+:root{
+  --bg:#E4ECF6; --clay:#F3F7FC; --ink:#26304A; --muted:#66708A;
+  --coral:#FF8C6B; --coral-ink:#3A1408; --mint:#8EDDBB; --lilac:#BBA9F7; --sun:#FFD27A;
+  --hi:rgba(255,255,255,.85); --lo:rgba(70,90,130,.18); --drop:rgba(70,90,130,.22);
+  --display:"Mitr","IBM Plex Sans Thai Looped",system-ui,sans-serif;
+  --body:"IBM Plex Sans Thai Looped",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1C2030; --clay:#2A3046; --ink:#EEF1FA; --muted:#A4ACC4;
+  --coral:#FF8C6B; --coral-ink:#2A0E05; --mint:#5FC79C; --lilac:#9E89F0; --sun:#F2C45E;
+  --hi:rgba(255,255,255,.08); --lo:rgba(0,0,0,.35); --drop:rgba(0,0,0,.45); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1C2030; --clay:#2A3046; --ink:#EEF1FA; --muted:#A4ACC4;
+  --coral:#FF8C6B; --coral-ink:#2A0E05; --mint:#5FC79C; --lilac:#9E89F0; --sun:#F2C45E;
+  --hi:rgba(255,255,255,.08); --lo:rgba(0,0,0,.35); --drop:rgba(0,0,0,.45); color-scheme:dark}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px}
+main{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.clay{background:var(--clay);border-radius:28px;padding:18px;
+  box-shadow:10px 12px 24px var(--drop), inset -6px -8px 14px var(--lo), inset 6px 6px 12px var(--hi)}
+.clay-in{border-radius:18px;box-shadow:inset 4px 4px 10px var(--lo), inset -4px -4px 10px var(--hi)}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-family:var(--display);font-weight:600;font-size:26px;margin:0}
+.date{color:var(--muted);font-size:13px}
+h2{font-family:var(--display);font-weight:500;font-size:15px;margin:0 0 12px;color:var(--muted)}
+.num{font-family:var(--display);font-variant-numeric:tabular-nums}
+
+.hero{display:grid;grid-template-columns:148px 1fr;gap:16px;align-items:center}
+.ring{position:relative;width:148px;height:148px;border-radius:50%;padding:10px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .big{font-size:42px;font-weight:600;line-height:1}
+.ring .of{color:var(--muted);font-size:12px}
+.stats{display:flex;flex-direction:column;gap:8px;min-width:0}
+.stat .v{font-size:24px;font-weight:500;line-height:1.15}
+.stat .l{color:var(--muted);font-size:12.5px}
+.pill{display:inline-block;align-self:flex-start;padding:4px 12px;border-radius:99px;font-size:13px;font-weight:600;background:var(--lilac);color:#1D1640;
+  box-shadow:inset -2px -3px 5px rgba(0,0,0,.12), inset 2px 2px 4px rgba(255,255,255,.5)}
+.pill.ok{background:var(--mint);color:#0E2C20}
+
+.next{display:flex;align-items:center;gap:14px}
+.next .bell{flex:none;width:52px;height:52px;border-radius:18px;background:var(--sun);display:grid;place-items:center;
+  box-shadow:4px 5px 10px var(--drop), inset -3px -4px 6px rgba(0,0,0,.12), inset 3px 3px 6px rgba(255,255,255,.55)}
+.next .bell svg{width:26px;height:26px}
+.next .t{font-family:var(--display);font-size:20px;font-weight:500;line-height:1.2}
+.next .s{color:var(--muted);font-size:13px}
+.next.due .bell{background:var(--coral);animation:wob 1.2s ease-in-out infinite}
+@keyframes wob{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+
+.sets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.set{border-radius:18px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;gap:1px;min-width:0}
+.set .sn{font-size:11px;color:var(--muted)}
+.set .sv{font-family:var(--display);font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
+.set .st{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set.todo{box-shadow:inset 3px 3px 7px var(--lo), inset -3px -3px 7px var(--hi)}
+.set.done{background:var(--mint);color:#0E2C20;box-shadow:3px 4px 8px var(--drop), inset -3px -4px 6px rgba(0,0,0,.12), inset 3px 3px 6px rgba(255,255,255,.45)}
+.set.done .sn,.set.done .st{color:#22513D}
+.set.now{background:var(--lilac);color:#1D1640;box-shadow:3px 4px 8px var(--drop), inset -3px -4px 6px rgba(0,0,0,.12), inset 3px 3px 6px rgba(255,255,255,.45)}
+.set.now .sn,.set.now .st{color:#3E3270}
+.setmeta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--muted)}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font:inherit;cursor:pointer}
+
+.tabs{display:flex;gap:6px;padding:6px;border-radius:22px}
+.tabs button{flex:1;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:16px;font-family:var(--display);font-size:15px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--clay);color:var(--ink);box-shadow:4px 4px 10px var(--drop), inset -2px -3px 6px var(--lo), inset 2px 2px 5px var(--hi)}
+
+.stack{display:flex;flex-direction:column;gap:14px}
+.tap{width:100%;min-height:160px;border:0;border-radius:36px;background:var(--coral);color:var(--coral-ink);font-family:var(--display);font-size:40px;font-weight:600;
+  cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .1s, box-shadow .1s;
+  box-shadow:10px 14px 26px var(--drop), inset -10px -12px 20px rgba(0,0,0,.14), inset 10px 10px 18px rgba(255,255,255,.45)}
+.tap small{display:block;font-family:var(--body);font-size:15px;font-weight:600;opacity:.8}
+.tap:active{transform:scale(.97);box-shadow:4px 6px 12px var(--drop), inset -6px -8px 14px rgba(0,0,0,.16), inset 8px 8px 16px rgba(255,255,255,.35)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.btn{flex:1 1 0;min-width:60px;padding:13px 8px;border-radius:20px;border:0;background:var(--clay);color:var(--ink);font-family:var(--display);font-size:17px;cursor:pointer;touch-action:manipulation;
+  box-shadow:5px 6px 12px var(--drop), inset -3px -4px 8px var(--lo), inset 3px 3px 7px var(--hi);transition:transform .1s}
+.btn:active{transform:scale(.96)}
+.btn.dark{background:var(--ink);color:var(--bg)}
+.btn.mint{background:var(--mint);color:#0E2C20}
+.btn.coral{background:var(--coral);color:var(--coral-ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+
+.target{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px}
+.target .lbl{font-size:13px;color:var(--muted)}
+.target .val{font-family:var(--display);font-size:22px;font-weight:600;min-width:3ch;text-align:center}
+.round{width:44px;height:44px;flex:none;border-radius:50%;padding:0;font-size:22px;min-width:0}
+.cue{text-align:center;font-family:var(--display);font-size:44px;font-weight:600;min-height:64px;color:var(--coral)}
+.hint{color:var(--muted);font-size:13px;margin:0}
+
+.hr{display:flex;flex-direction:column;gap:10px}
+.hr .q{font-family:var(--display);font-size:17px}
+.hr-row{display:flex;gap:10px;align-items:center}
+.hr-row input{flex:1;min-width:0;font-size:22px;font-family:var(--display);padding:10px 14px;border:0;background:var(--bg);color:var(--ink);border-radius:16px;
+  box-shadow:inset 3px 3px 8px var(--lo), inset -3px -3px 8px var(--hi)}
+.hr-row .btn{flex:none;padding-inline:16px}
+.zone{font-size:13px;color:var(--muted)}
+
+.streakline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.streakline .v{font-size:22px}
+.bars{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;align-items:end;height:90px;padding:8px;border-radius:18px}
+.bar{background:var(--lilac);border-radius:6px;min-height:4px;opacity:.75}
+.bar.hit{background:var(--mint);opacity:1}
+.bar.today{box-shadow:0 0 0 2px var(--coral)}
+.barlabels{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;font-size:10px;color:var(--muted);text-align:center;margin-top:4px;padding-inline:8px}
+
+.calc table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+.calc td{padding:7px 0;border-bottom:1px dashed var(--lo)}
+.calc td:last-child{text-align:right;font-family:var(--display);font-weight:500}
+details summary{cursor:pointer;font-family:var(--display);font-size:16px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.form label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted);min-width:0}
+.form input,.form select{font-size:16px;padding:10px 12px;border:0;border-radius:14px;background:var(--bg);color:var(--ink);width:100%;min-width:0;font-family:var(--display);
+  box-shadow:inset 3px 3px 7px var(--lo), inset -3px -3px 7px var(--hi)}
+.form .full{grid-column:1/-1}
+.sync{font-size:12px;color:var(--muted);text-align:center}
+@media (prefers-reduced-motion:reduce){.tap,.btn{transition:none}.next.due .bell{animation:none}}
+.onb{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;
+  padding:calc(env(safe-area-inset-top,0px) + 28px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 28px) max(16px,env(safe-area-inset-left,0px))}
+.onb .in{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.onb h1{font-size:30px}
+.onb p{margin:0;color:var(--muted)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1}
+.seg button[aria-pressed="true"]{background:var(--lilac);color:#1D1640}
+.err{color:#C0392B;font-size:13px;min-height:1.2em}
+.minirow{display:flex;gap:10px;flex-wrap:wrap}
+.minirow .btn{font-size:15px}
+</style>
+</head>
+<body>
+
+<section class="onb" id="onb" hidden aria-label="ตั้งค่าครั้งแรก">
+  <div class="in">
+    <h1>Squat 100</h1>
+    <p>สควอตวันละ 100 ครั้ง แบ่งเป็นเซ็ตตลอดวัน แอปนับให้และคำนวณแคลอรี่จากข้อมูลร่างกายของคุณ ข้อมูลทั้งหมดเก็บในมือถือเครื่องนี้เท่านั้น ไม่ต้องสมัครสมาชิก</p>
+    <div class="clay form" style="margin-top:0">
+      <label class="full">เพศ (ใช้ในสูตรคำนวณแคล)
+        <span class="seg"><button type="button" class="btn" id="o-m" aria-pressed="true">ชาย</button><button type="button" class="btn" id="o-f" aria-pressed="false">หญิง</button></span></label>
+      <label>น้ำหนัก (กก.)<input id="o-weight" type="number" inputmode="decimal" min="30" max="250" step="0.1" placeholder="เช่น 70"></label>
+      <label>ส่วนสูง (ซม.)<input id="o-height" type="number" inputmode="decimal" min="100" max="230" placeholder="เช่น 170"></label>
+      <label>อายุ (ปี)<input id="o-age" type="number" inputmode="numeric" min="12" max="90" placeholder="เช่น 25"></label>
+      <label>เป้าต่อวัน (ครั้ง)<input id="o-goal" type="number" inputmode="numeric" min="10" max="1000" step="5" value="100"></label>
+      <div class="err full" id="o-err"></div>
+      <button class="btn coral full" id="o-go" type="button">เริ่มใช้งาน</button>
+    </div>
+  </div>
+</section>
+
+<main>
+  <header>
+    <h1>Squat 100</h1>
+    <span class="date" id="today-label"></span>
+  </header>
+
+  <section class="clay hero" aria-label="ความคืบหน้าวันนี้">
+    <div class="ring clay-in">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--lo)" stroke-width="13"></circle>
+        <circle id="ring-fg" cx="60" cy="60" r="50" fill="none" stroke="var(--coral)" stroke-width="13" stroke-linecap="round" stroke-dasharray="314.2" stroke-dashoffset="314.2"></circle>
+      </svg>
+      <div class="center"><span class="big num" id="count">0</span><span class="of">จาก <span id="goal-label">100</span> ครั้ง</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v num" id="kcal">0</div><div class="l">kcal วันนี้ (ประมาณ)</div></div>
+      <div class="stat"><div class="v num" id="hr-avg">–</div><div class="l">ชีพจรเฉลี่ยหลังเซ็ต (bpm)</div></div>
+      <span class="pill" id="status">เริ่มกันเลย</span>
+    </div>
+  </section>
+
+  <section class="clay next" id="next" aria-live="polite">
+    <div class="bell" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#3A2A05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+    <div><div class="t" id="next-t">เซ็ตถัดไป</div><div class="s" id="next-s"></div></div>
+  </section>
+
+  <section class="clay next" id="watch" aria-label="เชื่อมนาฬิกา">
+    <div class="bell" style="background:var(--mint)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#0E2C20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></svg></div>
+    <div style="flex:1;min-width:0"><div class="t" id="w-t">ชีพจรสดจากนาฬิกา</div><div class="s" id="w-s">ต้องเปิด "แชร์ข้อมูลชีพจร" บนนาฬิกาก่อน</div></div>
+    <button class="btn" id="w-btn" type="button" style="flex:none;padding-inline:14px">เชื่อม</button>
+  </section>
+
+  <section class="clay" aria-label="เซ็ตวันนี้">
+    <h2>เซ็ตวันนี้</h2>
+    <div class="sets" id="sets"></div>
+    <div class="setmeta"><span id="lastset">ยังไม่ได้เริ่มเซ็ตแรก</span><button class="linkbtn" id="undo-set" hidden>ลบเซ็ตล่าสุด</button></div>
+  </section>
+
+  <section class="clay hr" id="hr-box" hidden aria-label="บันทึกชีพจร">
+    <div class="q">ชีพจรตอนจบเซ็ตเท่าไหร่?</div>
+    <p class="hint">ดูตัวเลขหัวใจบนสมาร์ทวอทช์ทันทีที่จบเซ็ต แล้วพิมพ์ที่นี่ แอปจะใช้คำนวณแคลให้แม่นขึ้น</p>
+    <div class="hr-row">
+      <input id="hr-in" type="number" inputmode="numeric" min="40" max="220" placeholder="เช่น 128" aria-label="ชีพจร (ครั้งต่อนาที)">
+      <button class="btn mint" id="hr-save">บันทึก</button>
+      <button class="btn" id="hr-skip">ข้าม</button>
+    </div>
+    <div class="zone" id="hr-zone"></div>
+  </section>
+
+  <div class="tabs clay-in" role="tablist">
+    <button role="tab" id="tab-tap" aria-selected="true">แตะนับเอง</button>
+    <button role="tab" id="tab-pace" aria-selected="false">ทำตามเสียงจังหวะ</button>
+  </div>
+
+  <div class="clay target">
+    <button class="btn round" id="t-minus" aria-label="ลดจำนวนครั้งของเซ็ตนี้">−</button>
+    <div style="text-align:center"><div class="lbl">เซ็ตนี้ทำ</div><div class="val" id="t-val">25</div><div class="lbl">ครั้ง</div></div>
+    <button class="btn round" id="t-plus" aria-label="เพิ่มจำนวนครั้งของเซ็ตนี้">+</button>
+  </div>
+
+  <section id="mode-tap" class="stack">
+    <button class="tap" id="tap">+1<small id="tap-sub">เซ็ต 1 · 0/25</small></button>
+    <div class="row">
+      <button class="btn" id="minus">−1</button>
+      <button class="btn" id="plus5">+5</button>
+      <button class="btn" id="plus10">+10</button>
+      <button class="btn dark" id="finish">จบเซ็ต</button>
+    </div>
+    <p class="hint">ครบจำนวนแล้วแอปบันทึกเซ็ตพร้อมเวลาให้เอง ถ้าทำได้น้อยกว่านั้นให้กด "จบเซ็ต" ปุ่ม − / + ด้านบนใช้ลดหรือเพิ่มจำนวนครั้งของเซ็ตนี้ทีละ 5</p>
+  </section>
+
+  <section id="mode-pace" class="stack" hidden>
+    <div class="clay stack">
+      <div class="cue" id="cue">พร้อม</div>
+      <div class="row">
+        <button class="btn coral" id="pace-start">เริ่ม</button>
+        <button class="btn" id="pace-stop">หยุด</button>
+      </div>
+      <p class="hint">ใส่ AirPods แล้วกดเริ่ม เสียงต่ำ = ย่อลง เสียงสูง = ยืนขึ้น แอปนับให้เองและหยุดเมื่อครบเซ็ต</p>
+    </div>
+  </section>
+
+  <section class="clay" aria-label="สถิติ">
+    <h2>สถิติ 14 วัน</h2>
+    <div class="streakline">
+      <div class="stat"><div class="v num" id="streak">0</div><div class="l">วันติดที่ครบเป้า</div></div>
+      <div class="stat"><div class="v num" id="best">0</div><div class="l">ดีที่สุด (วัน)</div></div>
+      <div class="stat"><div class="v num" id="week">0</div><div class="l">ครั้ง ใน 7 วัน</div></div>
+    </div>
+    <div class="bars clay-in" id="bars"></div>
+    <div class="barlabels" id="barlabels"></div>
+  </section>
+
+  <section class="clay calc" aria-label="แคลอรี่">
+    <h2>แคลอรี่จากสควอต</h2>
+    <table>
+      <tr><td>สควอต 100 ครั้ง (ไม่ใส่ชีพจร)</td><td><span id="k100">0</span> kcal</td></tr>
+      <tr><td>ใช้เวลาประมาณ</td><td><span id="t100">0</span> นาที</td></tr>
+      <tr><td>ต่อ 1 ครั้ง</td><td><span id="k1">0</span> kcal</td></tr>
+      <tr><td>BMI ของคุณ</td><td><span id="bmi">–</span></td></tr>
+    </table>
+    <p class="hint" style="margin-top:10px">ถ้าไม่ได้ใส่ชีพจร ใช้สูตร MET (ค่าเดา MET 5.0, 2.5 วินาที/ครั้ง) ถ้าใส่ชีพจร ใช้สูตรจากอัตราการเต้นหัวใจ (Keytel) กับน้ำหนัก อายุ เพศของคุณ ทั้งสองแบบเป็นค่าประมาณ อาจคลาดราว ±25%</p>
+  </section>
+
+  <section class="clay">
+    <details>
+      <summary>ตั้งค่า</summary>
+      <div class="form">
+        <label>เป้าต่อวัน (ครั้ง)<input id="s-goal" type="number" inputmode="numeric" min="10" max="1000" step="5"></label>
+        <label>ครั้งต่อเซ็ต (ปกติ)<input id="s-per" type="number" inputmode="numeric" min="1" max="200" step="1"></label>
+        <label>เตือนทุก<select id="s-every"><option value="1">1 ชั่วโมง</option><option value="2">2 ชั่วโมง</option><option value="3">3 ชั่วโมง</option><option value="4">4 ชั่วโมง</option></select></label>
+        <label>น้ำหนัก (กก.)<input id="s-weight" type="number" inputmode="decimal" min="30" max="250" step="0.1"></label>
+        <label>เริ่มเตือน<input id="s-from" type="time"></label>
+        <label>เลิกเตือน<input id="s-to" type="time"></label>
+        <label>อายุ (ปี)<input id="s-age" type="number" inputmode="numeric" min="12" max="90"></label>
+        <label>ส่วนสูง (ซม.)<input id="s-height" type="number" inputmode="decimal" min="100" max="230"></label>
+        <label>เพศ<select id="s-sex"><option value="m">ชาย</option><option value="f">หญิง</option></select></label>
+        <label>วินาทีต่อครั้ง<input id="s-pace" type="number" inputmode="decimal" min="1.2" max="8" step="0.1"></label>
+        <label>ค่า MET<input id="s-met" type="number" inputmode="decimal" min="2" max="10" step="0.5"></label>
+        <p class="hint full">การเตือนในหน้านี้ทำงานเฉพาะตอนเปิดแอปค้างไว้ ถ้าอยากให้มือถือและนาฬิกาเด้งเตือนแม้ปิดแอป กดปุ่มด้านล่างเพื่อเพิ่มนัดเตือนลงปฏิทินตามเวลาที่ตั้งไว้</p>
+        <div class="minirow full">
+          <button class="btn mint" id="ics" type="button">เพิ่มเตือนลงปฏิทิน</button>
+        </div>
+        <p class="hint full">ข้อมูลเก็บในเบราว์เซอร์ของมือถือเครื่องนี้เท่านั้น ถ้าล้างข้อมูลเบราว์เซอร์หรือเปลี่ยนเครื่อง ประวัติจะหายไป</p>
+        <div class="minirow full">
+          <button class="btn" id="reset" type="button">ล้างข้อมูลทั้งหมด</button>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <div class="sync" id="sync">กำลังโหลด…</div>
+</main>
+
+<script>
+(function(){
+  const DEF = {weight:70, height:170, sex:"m", age:25, goal:100, per:25, every:2, from:"08:00", to:"22:00", pace:2.5, met:5.0};
+  let settings = {...DEF};
+  // days: "YYYY-MM-DD" -> {sets:[{t:"HH:MM", n, hr?}], cur, target?}
+  let days = {};
+  let db = null, uid = null;
+  const LS = "squat100.web.v1";
+
+  const $ = id => document.getElementById(id);
+  const pad = n => String(n).padStart(2,"0");
+  const key = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  const todayKey = () => key(new Date());
+  const thDays = ["อา","จ","อ","พ","พฤ","ศ","ส"];
+  const nowHM = () => { const d=new Date(); return pad(d.getHours())+":"+pad(d.getMinutes()); };
+  const toMin = hm => { const m=/^(\d{1,2}):(\d{2})$/.exec(hm||""); return m ? (+m[1])*60+(+m[2]) : null; };
+  const fromMin = m => pad(Math.floor(m/60)%24)+":"+pad(m%60);
+
+  function norm(v){
+    if(typeof v === "number") return {sets: v>0 ? [{t:"", n:v}] : [], cur:0};
+    if(!v || typeof v !== "object") return {sets:[], cur:0};
+    const sets = Array.isArray(v.sets) ? v.sets.filter(x=>x && typeof x.n==="number").map(x=>{ const o={t:String(x.t||""), n:x.n}; if(typeof x.hr==="number") o.hr=x.hr; return o; }) : [];
+    const o = {sets, cur: typeof v.cur==="number" ? v.cur : 0};
+    if(typeof v.target==="number") o.target = v.target;
+    return o;
+  }
+  const total = d => d ? d.sets.reduce((a,x)=>a+x.n,0) + d.cur : 0;
+  const day = (k=todayKey()) => (days[k] ||= {sets:[], cur:0});
+  const curTarget = () => { const D=day(); return Math.max(1, D.target || settings.per); };
+
+  function fixSettings(s){
+    const o = {...DEF, ...(s||{})};
+    if(s && s.sets && !s.per) o.per = Math.max(1, Math.ceil(o.goal / s.sets));   // version 2 stored a number of sets
+    delete o.sets; return o;
+  }
+  function lsLoad(){ try{ const s = JSON.parse(localStorage.getItem(LS)||"null"); if(s){ days={}; for(const k in (s.days||{})) days[k]=norm(s.days[k]); settings = fixSettings(s.settings); } }catch(e){} }
+  function lsSave(){ try{ localStorage.setItem(LS, JSON.stringify({days, settings})); }catch(e){} }
+
+  // calories
+  const metKcalPerRep = () => settings.met * 3.5 * settings.weight / 200 / 60 * settings.pace;
+  function keytelKcal(hr, reps){   // Keytel et al. 2005: kcal/min from heart rate, weight, age, sex
+    const W = settings.weight, A = settings.age;
+    const perMin = settings.sex==="f"
+      ? (-20.4022 + 0.4472*hr - 0.1263*W + 0.074*A) / 4.184
+      : (-55.0969 + 0.6309*hr + 0.1988*W + 0.2017*A) / 4.184;
+    return Math.max(0, perMin) * reps * settings.pace / 60;
+  }
+  const setKcal = x => typeof x.hr==="number" ? keytelKcal(x.hr, x.n) : x.n * metKcalPerRep();
+  const dayKcal = D => D.sets.reduce((a,x)=>a+setKcal(x),0) + D.cur*metKcalPerRep();
+  const fmt = (n,d=0) => n.toLocaleString("th-TH",{maximumFractionDigits:d,minimumFractionDigits:d});
+  const maxHR = () => 220 - settings.age;
+
+  function streaks(){
+    const g = settings.goal; let cur = 0, best = 0, run = 0;
+    const d = new Date(); if(total(days[key(d)]) < g) d.setDate(d.getDate()-1);
+    for(;;){ if(total(days[key(d)]) >= g){ cur++; d.setDate(d.getDate()-1); } else break; }
+    const ks = Object.keys(days).filter(k=>total(days[k])>=g).sort();
+    let prev = null;
+    for(const k of ks){ const t = new Date(k+"T12:00:00"); run = (prev && (t-prev)/864e5 < 1.5) ? run+1 : 1; best = Math.max(best, run); prev = t; }
+    return {cur, best:Math.max(best,cur)};
+  }
+
+  // ---- reminder (in page, while open)
+  function nextInfo(){
+    const D = day(), n = total(D);
+    const now = new Date(), nm = now.getHours()*60+now.getMinutes();
+    if(n >= settings.goal) return {state:"done"};
+    if(D.cur > 0) return {state:"active"};
+    const a = toMin(settings.from), b = toMin(settings.to), step = settings.every*60;
+    const last = D.sets.length ? toMin(D.sets[D.sets.length-1].t) : null;
+    let due;
+    if(last != null) due = last + step;
+    else if(a != null && nm < a) due = a;
+    else due = nm;   // no set yet today and the window has started: now
+    if(a != null && due < a) due = a;
+    if(b != null && due > b) return {state:"later", left: settings.goal-n};
+    return {state: due <= nm ? "due" : "wait", due, mins: due-nm, left: settings.goal-n};
+  }
+  let lastAlerted = null;
+  function renderNext(){
+    const info = nextInfo(), box = $("next");
+    box.classList.toggle("due", info.state==="due");
+    const t=$("next-t"), s=$("next-s");
+    if(info.state==="done"){ t.textContent="ครบเป้าวันนี้แล้ว"; s.textContent="พักได้เลย พรุ่งนี้เจอกันใหม่"; }
+    else if(info.state==="active"){ t.textContent="กำลังทำเซ็ตอยู่"; s.textContent="ทำต่อให้ครบ "+curTarget()+" ครั้ง"; }
+    else if(info.state==="later"){ t.textContent="เลยช่วงเตือนของวันนี้แล้ว"; s.textContent="ยังเหลือ "+info.left+" ครั้ง ถ้ายังไหวทำเพิ่มได้"; }
+    else if(info.state==="due"){ t.textContent="ถึงเวลาสควอตแล้ว!"; s.textContent="เซ็ตนี้ "+curTarget()+" ครั้ง · วันนี้เหลือ "+info.left+" ครั้ง";
+      const tag = todayKey()+"@"+info.due;
+      if(lastAlerted !== tag){ const first = lastAlerted===null; lastAlerted = tag; if(!first && document.visibilityState==="visible"){ chime(); buzz([200,100,200]); } } }
+    else { const h=Math.floor(info.mins/60), m=info.mins%60;
+      t.textContent="เซ็ตถัดไป "+fromMin(info.due)+" น.";
+      s.textContent="อีก "+(h? h+" ชม. ":"")+m+" นาที · เตือนทุก "+settings.every+" ชม."; lastAlerted = lastAlerted ?? "wait"; }
+  }
+
+  function cell(cls, label, value, sub, extra){
+    const c=document.createElement("div"); c.className="set "+cls;
+    const parts=[["sn",label],["sv",value],["st",sub]]; if(extra) parts.push(["st",extra]);
+    for(const [k,t] of parts){ const e=document.createElement("span"); e.className=k; e.textContent=t; c.appendChild(e); }
+    return c;
+  }
+
+  function render(){
+    const D = day(), n = total(D), g = settings.goal, ps = curTarget();
+    $("count").textContent = n;
+    $("goal-label").textContent = g;
+    $("kcal").textContent = fmt(dayKcal(D),1);
+    const hrs = D.sets.filter(x=>typeof x.hr==="number").map(x=>x.hr);
+    $("hr-avg").textContent = hrs.length ? Math.round(hrs.reduce((a,b)=>a+b,0)/hrs.length) : "–";
+    $("ring-fg").setAttribute("stroke-dashoffset", 314.2*(1-Math.min(1,n/g)));
+    $("ring-fg").setAttribute("stroke", n>=g ? "var(--mint)" : "var(--coral)");
+    const st = $("status");
+    if(n>=g){ st.textContent="ครบเป้าแล้ว"; st.className="pill ok"; }
+    else if(n>0){ st.textContent="อีก "+(g-n)+" ครั้ง"; st.className="pill"; }
+    else { st.textContent="เริ่มกันเลย"; st.className="pill"; }
+
+    const box = $("sets"); box.textContent = "";
+    D.sets.forEach((x,i)=> box.appendChild(cell("done", "เซ็ต "+(i+1), x.n, x.t||"—", typeof x.hr==="number" ? "♥ "+x.hr : "")));
+    const curIdx = D.sets.length;
+    if(n < g || D.cur > 0) box.appendChild(cell("now", "เซ็ต "+(curIdx+1), D.cur+"/"+ps, "กำลังทำ"));
+    let remain = g - n - (n<g ? Math.max(0, ps - D.cur) : 0), j = curIdx + 2;
+    while(remain > 0){ const v=Math.min(settings.per,remain); box.appendChild(cell("todo", "เซ็ต "+j, v, "รอทำ")); remain-=v; j++; }
+    const last = D.sets[D.sets.length-1];
+    $("lastset").textContent = last ? ("ทำไปแล้ว "+D.sets.length+" เซ็ต" + (last.t ? " · ล่าสุด "+last.t+" น." : "")) : "ยังไม่ได้เริ่มเซ็ตแรก";
+    $("undo-set").hidden = !last;
+    $("tap-sub").textContent = "เซ็ต "+(curIdx+1)+" · "+D.cur+"/"+ps;
+    $("t-val").textContent = ps;
+
+    const s = streaks(); $("streak").textContent = s.cur; $("best").textContent = s.best;
+    const bars = $("bars"), labels = $("barlabels"); bars.textContent=""; labels.textContent="";
+    let week = 0, max = g; const list = [];
+    for(let i=13;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const dd=days[key(d)]; const v=total(dd); list.push([d,v,i,dd]); max=Math.max(max,v); if(i<7) week+=v; }
+    for(const [d,v,i,dd] of list){
+      const b=document.createElement("div"); b.className="bar"+(v>=g?" hit":"")+(i===0?" today":"");
+      b.style.height=Math.max(4, v/max*100)+"%"; b.title=key(d)+": "+v+" ครั้ง"+(dd&&dd.sets.length?" ใน "+dd.sets.length+" เซ็ต":""); bars.appendChild(b);
+      const l=document.createElement("div"); l.textContent=thDays[d.getDay()]; if(i===0){ l.style.fontWeight="700"; l.style.color="var(--ink)"; } labels.appendChild(l);
+    }
+    $("week").textContent = week;
+
+    const k1 = metKcalPerRep();
+    $("k100").textContent = fmt(k1*100,0);
+    $("t100").textContent = fmt(settings.pace*100/60,1);
+    $("k1").textContent = fmt(k1,2);
+    const hm = settings.height/100; const bmi = settings.weight/(hm*hm);
+    $("bmi").textContent = isFinite(bmi) ? fmt(bmi,1)+(bmi<18.5?" (น้อย)":bmi<23?" (ปกติ)":bmi<25?" (เกินเล็กน้อย)":bmi<30?" (อ้วนระดับ 1)":" (อ้วนระดับ 2)") : "–";
+    renderNext();
+  }
+
+  // ---- saving
+  let saveTimer = null, pendingDays = new Set(), settingsDirty = false;
+  function scheduleSave(dayKey, now){
+    if(dayKey) pendingDays.add(dayKey);
+    lsSave();
+    clearTimeout(saveTimer); saveTimer = setTimeout(flush, now ? 50 : 900);
+  }
+  function flush(){}
+
+  function buzz(p){ if(navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
+  function chime(){ beep(880,.15); setTimeout(()=>beep(1175,.25),170); }
+
+  // ---- heart rate after a set
+  let hrFor = null;
+  function askHR(idx){
+    hrFor = idx; $("hr-in").value = ""; $("hr-zone").textContent = "ชีพจรสูงสุดโดยประมาณของคุณ "+maxHR()+" bpm (220 − อายุ)";
+    $("hr-box").hidden = false;
+  }
+  function saveHR(){
+    const v = parseInt($("hr-in").value,10);
+    if(!(v>=40 && v<=220)){ $("hr-zone").textContent = "ใส่ตัวเลขระหว่าง 40–220 ครั้งต่อนาที"; return; }
+    const D = day(); const x = D.sets[hrFor]; if(x) x.hr = v;
+    const pct = Math.round(v/maxHR()*100);
+    const zone = pct<60 ? "เบา ลองเพิ่มครั้งต่อเซ็ตได้" : pct<75 ? "ปานกลาง กำลังดี" : pct<88 ? "หนัก ดีสำหรับเผาผลาญ" : "หนักมาก ถ้าเหนื่อยเกินไปลดครั้งต่อเซ็ตลง";
+    $("hr-box").hidden = true; hrFor = null;
+    $("sync").textContent = "ชีพจร "+v+" bpm = "+pct+"% ของสูงสุด · "+zone;
+    render(); scheduleSave(todayKey(), true);
+  }
+
+  // ---- live heart rate over Bluetooth (standard Heart Rate service; Chrome on Android/desktop)
+  let liveHR = null, peakHR = null, hrDevice = null;
+  function onHR(e){
+    const v = e.target.value, flags = v.getUint8(0);
+    const bpm = (flags & 1) ? v.getUint16(1, true) : v.getUint8(1);
+    if(!bpm) return;
+    liveHR = bpm; if(day().cur > 0) peakHR = Math.max(peakHR||0, bpm);
+    $("w-t").textContent = "♥ "+bpm+" bpm"; $("w-s").textContent = "เชื่อมแล้ว · "+Math.round(bpm/maxHR()*100)+"% ของชีพจรสูงสุด";
+  }
+  $("w-btn").addEventListener("click", async ()=>{
+    if(!navigator.bluetooth){ $("w-s").textContent = "เบราว์เซอร์นี้เชื่อมบลูทูธไม่ได้ (iPhone ใช้ไม่ได้ ใช้ Chrome บน Android หรือแอป Bluefy บน iPhone) ให้พิมพ์ชีพจรเองหลังจบเซ็ตแทน"; return; }
+    try{
+      $("w-s").textContent = "กำลังค้นหานาฬิกา…";
+      hrDevice = await navigator.bluetooth.requestDevice({filters:[{services:["heart_rate"]}]});
+      hrDevice.addEventListener("gattserverdisconnected", ()=>{ liveHR=null; $("w-t").textContent="ชีพจรสดจากนาฬิกา"; $("w-s").textContent="หลุดการเชื่อมต่อ กดเชื่อมใหม่ได้"; $("w-btn").textContent="เชื่อม"; });
+      const server = await hrDevice.gatt.connect();
+      const ch = await (await server.getPrimaryService("heart_rate")).getCharacteristic("heart_rate_measurement");
+      ch.addEventListener("characteristicvaluechanged", onHR); await ch.startNotifications();
+      $("w-btn").textContent = "เชื่อมแล้ว"; $("w-s").textContent = "รอค่าชีพจร…";
+    }catch(err){ $("w-s").textContent = "เชื่อมไม่สำเร็จ เช็กว่าเปิดแชร์ข้อมูลชีพจรบนนาฬิกาแล้วลองใหม่"; }
+  });
+
+  function finishSet(auto){
+    const D = day(); if(D.cur <= 0) return;
+    D.sets.push({t: nowHM(), n: D.cur}); D.cur = 0; delete D.target;
+    chime(); buzz([30,60,30]);
+    if(auto) say("ครบเซ็ต");
+    render(); scheduleSave(todayKey(), true);
+    askHR(D.sets.length-1);
+    const auto2 = peakHR || liveHR; peakHR = null;
+    if(auto2){ $("hr-in").value = auto2; $("hr-zone").textContent = "เติมจากนาฬิกาให้แล้ว (สูงสุดระหว่างเซ็ต) กดบันทึกได้เลย"; }
+  }
+
+  function add(n){
+    const k = todayKey(), D = day(k);
+    if(n < 0 && D.cur <= 0) return;
+    D.cur = Math.max(0, D.cur + n);
+    buzz(n>0?15:[10,40,10]);
+    if(n > 0 && D.cur >= curTarget()) { finishSet(true); stopPace(true); return; }
+    render(); scheduleSave(k);
+  }
+  function changeTarget(delta){
+    const D = day(); const v = curTarget() + delta;
+    if(v < 1) return;
+    D.target = v;
+    if(D.cur > 0 && D.cur >= v){ stopPace(true); finishSet(false); return; }
+    render(); scheduleSave(todayKey());
+  }
+
+  // ---- audio
+  let ac = null;
+  function audio(){ if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(ac && ac.state==="suspended") ac.resume(); return ac; }
+  function beep(freq, dur){
+    const a = audio(); if(!a) return;
+    const o=a.createOscillator(), g=a.createGain(); o.frequency.value=freq; o.type="sine";
+    g.gain.setValueAtTime(0.0001,a.currentTime); g.gain.exponentialRampToValueAtTime(0.35,a.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+dur); o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime+dur+0.02);
+  }
+  let thaiVoice = null;
+  function pickVoice(){ try{ thaiVoice = (speechSynthesis.getVoices()||[]).find(v=>/^th/i.test(v.lang))||null; }catch(e){} }
+  try{ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }catch(e){}
+  function say(text){ if(!thaiVoice) return; try{ const u=new SpeechSynthesisUtterance(text); u.voice=thaiVoice; u.lang=thaiVoice.lang; u.rate=1.1; speechSynthesis.speak(u);}catch(e){} }
+
+  let paceTimer = null, preTimer = null, wake = null, sessionReps = 0;
+  function startPace(){
+    if(paceTimer || preTimer) return; audio(); sessionReps = 0; $("hr-box").hidden = true;
+    try{ navigator.wakeLock && navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{}); }catch(e){}
+    let c = 3; $("cue").textContent = c;
+    preTimer = setInterval(()=>{ c--; if(c>0){ $("cue").textContent=c; beep(660,.08);} else { clearInterval(preTimer); preTimer=null; run(); } }, 800);
+    function run(){
+      let half = false; const ms = settings.pace*1000/2;
+      const step = () => {
+        if(!half){ $("cue").textContent="ลง ↓"; beep(330,.18); }
+        else { $("cue").textContent="ขึ้น ↑"; beep(660,.12); sessionReps++;
+          const c2 = day().cur + 1; if(c2 % 10 === 0 && c2 < curTarget()) say(String(c2));
+          add(1); }
+        half = !half;
+      };
+      step(); paceTimer = setInterval(step, ms);
+    }
+  }
+  function stopPace(done){
+    const wasRunning = paceTimer || preTimer;
+    clearInterval(paceTimer); clearInterval(preTimer); paceTimer=null; preTimer=null;
+    if(wasRunning || done) $("cue").textContent = done ? "ครบเซ็ตแล้ว พักก่อน" : (sessionReps ? "หยุดที่ "+day().cur+" ครั้ง" : "พร้อม");
+    try{ wake && wake.release(); }catch(e){} wake=null;
+  }
+
+  // ---- wire up
+  $("tap").addEventListener("click", ()=>add(1));
+  $("minus").addEventListener("click", ()=>add(-1));
+  $("plus5").addEventListener("click", ()=>add(5));
+  $("plus10").addEventListener("click", ()=>add(10));
+  $("finish").addEventListener("click", ()=>{ stopPace(); finishSet(false); });
+  $("t-minus").addEventListener("click", ()=>changeTarget(-5));
+  $("t-plus").addEventListener("click", ()=>changeTarget(5));
+  $("pace-start").addEventListener("click", startPace);
+  $("pace-stop").addEventListener("click", ()=>stopPace(false));
+  $("hr-save").addEventListener("click", saveHR);
+  $("hr-in").addEventListener("keydown", e=>{ if(e.key==="Enter") saveHR(); });
+  $("hr-skip").addEventListener("click", ()=>{ $("hr-box").hidden = true; hrFor = null; });
+  let undoArmed = null;
+  $("undo-set").addEventListener("click", ()=>{
+    const b = $("undo-set");
+    if(!undoArmed){ b.textContent = "แตะอีกครั้งเพื่อยืนยันการลบ"; undoArmed = setTimeout(()=>{ undoArmed=null; b.textContent="ลบเซ็ตล่าสุด"; }, 3000); return; }
+    clearTimeout(undoArmed); undoArmed = null; b.textContent = "ลบเซ็ตล่าสุด";
+    day().sets.pop(); $("hr-box").hidden = true; render(); scheduleSave(todayKey(), true);
+  });
+  function tab(which){
+    const pace = which==="pace";
+    $("tab-tap").setAttribute("aria-selected", String(!pace)); $("tab-pace").setAttribute("aria-selected", String(pace));
+    $("mode-tap").hidden = pace; $("mode-pace").hidden = !pace;
+    if(!pace) stopPace(false);
+    try{ localStorage.setItem(LS+".tab", which); }catch(e){}
+  }
+  $("tab-tap").addEventListener("click", ()=>tab("tap"));
+  $("tab-pace").addEventListener("click", ()=>tab("pace"));
+
+  const numFields = {weight:"s-weight", height:"s-height", age:"s-age", goal:"s-goal", per:"s-per", pace:"s-pace", met:"s-met", every:"s-every"};
+  const intKeys = new Set(["age","goal","per","every"]);
+  function fillForm(){ for(const [k,id] of Object.entries(numFields)) $(id).value = settings[k]; $("s-from").value=settings.from; $("s-to").value=settings.to; $("s-sex").value=settings.sex; }
+  $("s-sex").addEventListener("change", ()=>{ settings.sex = $("s-sex").value==="f" ? "f" : "m"; render(); scheduleSave(); });
+  for(const [k,id] of Object.entries(numFields)){
+    $(id).addEventListener("change", ()=>{
+      const v = parseFloat($(id).value);
+      if(isFinite(v) && v>0){ settings[k] = intKeys.has(k) ? Math.max(1,Math.round(v)) : v; settingsDirty = true; render(); scheduleSave(); }
+      else $(id).value = settings[k];
+    });
+  }
+  for(const k of ["from","to"]) $("s-"+k).addEventListener("change", ()=>{ const v=$("s-"+k).value; if(toMin(v)!=null){ settings[k]=v; settingsDirty=true; render(); scheduleSave(); } });
+
+  const dateLabel = () => $("today-label").textContent = new Date().toLocaleDateString("th-TH",{weekday:"long", day:"numeric", month:"short"});
+  dateLabel(); lsLoad(); fillForm(); render();
+  try{ if(localStorage.getItem(LS+".tab")==="pace") tab("pace"); }catch(e){}
+  $("sync").textContent = "บันทึกไว้ในเครื่องนี้";
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ dateLabel(); render(); } });
+  setInterval(renderNext, 30000);
+
+  // ---- first run
+  let oSex = "m";
+  $("o-m").addEventListener("click", ()=>{ oSex="m"; $("o-m").setAttribute("aria-pressed","true"); $("o-f").setAttribute("aria-pressed","false"); });
+  $("o-f").addEventListener("click", ()=>{ oSex="f"; $("o-f").setAttribute("aria-pressed","true"); $("o-m").setAttribute("aria-pressed","false"); });
+  $("o-go").addEventListener("click", ()=>{
+    const w=parseFloat($("o-weight").value), h=parseFloat($("o-height").value), a=parseInt($("o-age").value,10), g=parseInt($("o-goal").value,10)||100;
+    if(!(w>=30&&w<=250)) return void($("o-err").textContent="ใส่น้ำหนักระหว่าง 30–250 กก.");
+    if(!(h>=100&&h<=230)) return void($("o-err").textContent="ใส่ส่วนสูงระหว่าง 100–230 ซม.");
+    if(!(a>=12&&a<=90)) return void($("o-err").textContent="ใส่อายุระหว่าง 12–90 ปี");
+    settings = {...settings, weight:w, height:h, age:a, sex:oSex, goal:Math.max(10,g), per:Math.max(1,Math.round(Math.max(10,g)/4)), onboarded:true};
+    lsSave(); fillForm(); render(); $("onb").hidden = true; window.scrollTo(0,0);
+  });
+  if(!settings.onboarded) $("onb").hidden = false;
+  $("sync").textContent = "ข้อมูลเก็บในมือถือเครื่องนี้เท่านั้น";
+
+  // ---- calendar reminders (.ics with a daily repeating event per slot)
+  $("ics").addEventListener("click", ()=>{
+    const a = toMin(settings.from), b = toMin(settings.to), step = settings.every*60;
+    if(a==null || b==null || b<=a){ $("sync").textContent = "ตั้งเวลาเริ่มให้น้อยกว่าเวลาเลิกเตือนก่อน"; return; }
+    const d = new Date(), ymd = d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+    const stamp = new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
+    const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Squat100//TH","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
+    let i = 0;
+    for(let m=a; m<=b; m+=step){
+      const hh=pad(Math.floor(m/60)), mm=pad(m%60), end=m+5, eh=pad(Math.floor(end/60)), em=pad(end%60);
+      lines.push("BEGIN:VEVENT","UID:squat100-"+ymd+"-"+(i++)+"-"+Math.random().toString(36).slice(2,8)+"@squat100","DTSTAMP:"+stamp,
+        "DTSTART:"+ymd+"T"+hh+mm+"00","DTEND:"+ymd+"T"+eh+em+"00","RRULE:FREQ=DAILY",
+        "SUMMARY:สควอต "+settings.per+" ครั้ง (Squat 100)","DESCRIPTION:ถึงเวลาสควอตเซ็ตถัดไป เปิดแอป Squat 100 เพื่อนับ",
+        "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:ถึงเวลาสควอตแล้ว","TRIGGER:PT0M","END:VALARM","END:VEVENT");
+    }
+    lines.push("END:VCALENDAR");
+    const blob = new Blob([lines.join("\r\n")], {type:"text/calendar"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a"); link.href = url; link.download = "squat100-reminders.ics";
+    document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url), 10000);
+    $("sync").textContent = "เปิดไฟล์ที่ดาวน์โหลดแล้วเลือก \"เพิ่มทั้งหมด\" ลงปฏิทิน ("+i+" นัดต่อวัน)";
+  });
+
+  // ---- reset
+  let resetArmed = null;
+  $("reset").addEventListener("click", ()=>{
+    const b=$("reset");
+    if(!resetArmed){ b.textContent="แตะอีกครั้งเพื่อยืนยัน"; resetArmed=setTimeout(()=>{resetArmed=null; b.textContent="ล้างข้อมูลทั้งหมด";},3000); return; }
+    clearTimeout(resetArmed); try{ localStorage.removeItem(LS); localStorage.removeItem(LS+".tab"); }catch(e){} location.reload();
+  });
+})();
+</script>
+</body>
+</html>

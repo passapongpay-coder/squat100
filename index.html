@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Squat 100</title>
+<title>Squat Challenge 100</title>
 <meta name="description" content="นับสควอตวันละ 100 ครั้ง แบ่งเป็นเซ็ต คำนวณแคลอรี่ ข้อมูลเก็บในมือถือคุณเท่านั้น">
-<meta name="theme-color" content="#E4ECF6">
+<meta name="theme-color" content="#EFE8DC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Squat 100">
@@ -16,21 +16,21 @@
 <style>
 /* Layout: three pages (วันนี้ / สถิติ / ตั้งค่า) under a floating clay tab bar; "วันนี้" fits one phone screen */
 :root{
-  --bg:#E4ECF6; --clay:#F3F7FC; --ink:#26304A; --muted:#66708A;
-  --coral:#FF8C6B; --coral-ink:#3A1408; --mint:#8EDDBB; --lilac:#BBA9F7; --sun:#FFD27A;
-  --hi:rgba(255,255,255,.85); --lo:rgba(70,90,130,.18); --drop:rgba(70,90,130,.22);
-  --icon-accent:#BBA9F7;
+  --bg:#EFE8DC; --clay:#F8F3EA; --ink:#33382C; --muted:#7B7766;
+  --coral:#8FAE7E; --coral-ink:#1E2A17; --mint:#B9CFA4; --lilac:#E6C3A5; --sun:#E9CE95;
+  --hi:rgba(255,255,255,.75); --lo:rgba(120,100,70,.16); --drop:rgba(110,90,60,.18);
+  --icon-accent:#D9B48F;
   --display:"Mitr","IBM Plex Sans Thai Looped",system-ui,sans-serif;
   --body:"IBM Plex Sans Thai Looped",system-ui,-apple-system,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#1C2030; --clay:#2A3046; --ink:#EEF1FA; --muted:#A4ACC4;
-  --mint:#5FC79C; --lilac:#9E89F0; --sun:#F2C45E;
-  --hi:rgba(255,255,255,.08); --lo:rgba(0,0,0,.35); --drop:rgba(0,0,0,.45); --icon-accent:#6E5CC4; color-scheme:dark}}
+  --bg:#22241E; --clay:#2E3129; --ink:#EEEADF; --muted:#ABA694;
+  --coral:#9DBB8A; --coral-ink:#16200F; --mint:#7E9F6C; --lilac:#C49A78; --sun:#CDAE6E;
+  --hi:rgba(255,255,255,.06); --lo:rgba(0,0,0,.32); --drop:rgba(0,0,0,.4); --icon-accent:#8A6E52; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#1C2030; --clay:#2A3046; --ink:#EEF1FA; --muted:#A4ACC4;
-  --mint:#5FC79C; --lilac:#9E89F0; --sun:#F2C45E;
-  --hi:rgba(255,255,255,.08); --lo:rgba(0,0,0,.35); --drop:rgba(0,0,0,.45); --icon-accent:#6E5CC4; color-scheme:dark}
+  --bg:#22241E; --clay:#2E3129; --ink:#EEEADF; --muted:#ABA694;
+  --coral:#9DBB8A; --coral-ink:#16200F; --mint:#7E9F6C; --lilac:#C49A78; --sun:#CDAE6E;
+  --hi:rgba(255,255,255,.06); --lo:rgba(0,0,0,.32); --drop:rgba(0,0,0,.4); --icon-accent:#8A6E52; color-scheme:dark}
 :root{padding-top:env(safe-area-inset-top,0px)}
 html{-webkit-text-size-adjust:100%}
 *{box-sizing:border-box}
@@ -74,8 +74,8 @@ h2{font-family:var(--display);font-weight:500;font-size:14px;margin:0 0 10px;col
 .set .sv{font-family:var(--display);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
 .set .st{font-size:10.5px;opacity:.75;font-variant-numeric:tabular-nums;white-space:nowrap}
 .set.todo{box-shadow:inset 2px 2px 6px var(--lo), inset -2px -2px 6px var(--hi);color:var(--muted)}
-.set.done{background:var(--mint);color:#0E2C20;box-shadow:2px 3px 6px var(--drop), inset -2px -3px 5px rgba(0,0,0,.12), inset 2px 2px 4px rgba(255,255,255,.45)}
-.set.now{background:var(--lilac);color:#1D1640;box-shadow:2px 3px 6px var(--drop), inset -2px -3px 5px rgba(0,0,0,.12), inset 2px 2px 4px rgba(255,255,255,.45)}
+.set.done{background:var(--mint);color:#1E2A17;box-shadow:2px 3px 6px var(--drop), inset -2px -3px 5px rgba(0,0,0,.12), inset 2px 2px 4px rgba(255,255,255,.45)}
+.set.now{background:var(--lilac);color:#3B2A1C;box-shadow:2px 3px 6px var(--drop), inset -2px -3px 5px rgba(0,0,0,.12), inset 2px 2px 4px rgba(255,255,255,.45)}
 
 /* counter */
 .counter{display:flex;flex-direction:column;gap:10px}
@@ -88,15 +88,15 @@ h2{font-family:var(--display);font-weight:500;font-size:14px;margin:0 0 10px;col
 .tap .p1{font-size:44px;font-weight:600;line-height:1}
 .tap .p2{font-size:15px;font-weight:500;opacity:.85}
 .tap:active{transform:scale(.97)}
-.tap .bar{position:absolute;left:22px;right:22px;bottom:16px;height:8px;border-radius:99px;background:rgba(58,20,8,.15);overflow:hidden}
-.tap .bar i{display:block;height:100%;width:0;background:rgba(58,20,8,.55);border-radius:99px;transition:width .2s}
+.tap .bar{position:absolute;left:22px;right:22px;bottom:16px;height:8px;border-radius:99px;background:rgba(30,42,23,.15);overflow:hidden}
+.tap .bar i{display:block;height:100%;width:0;background:rgba(30,42,23,.55);border-radius:99px;transition:width .2s}
 .row{display:flex;gap:8px}
 .btn{flex:1 1 0;min-width:0;padding:11px 6px;border-radius:16px;border:0;background:var(--clay);color:var(--ink);font-family:var(--display);font-size:16px;cursor:pointer;touch-action:manipulation;
   display:flex;align-items:center;justify-content:center;gap:6px;
   box-shadow:4px 5px 10px var(--drop), inset -3px -3px 6px var(--lo), inset 3px 3px 6px var(--hi);transition:transform .1s}
 .btn:active{transform:scale(.96)}
 .btn.dark{background:var(--ink);color:var(--bg);flex-grow:1.6;white-space:nowrap}
-.btn.mint{background:var(--mint);color:#0E2C20}
+.btn.mint{background:var(--mint);color:#1E2A17}
 .btn.coral{background:var(--coral);color:var(--coral-ink)}
 .btn.ghost{box-shadow:none;background:transparent;color:var(--muted);text-decoration:underline;font-family:var(--body);font-size:13px;padding:4px}
 .stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted)}
@@ -145,6 +145,10 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 .switch input:focus-visible + span{outline:3px solid var(--lilac);outline-offset:2px}
 .times{display:flex;gap:8px}
 .times input{flex:1;min-width:0;font-size:16px;font-family:var(--display);padding:8px 10px;border:0;border-radius:12px;background:var(--bg);color:var(--ink);box-shadow:inset 2px 2px 6px var(--lo), inset -2px -2px 6px var(--hi)}
+.wchart{width:100%;height:120px;display:block;margin-top:10px}
+.steps{margin:6px 0 0;padding-left:20px;font-size:13px;color:var(--muted)}
+.steps li{margin:4px 0}
+details summary{cursor:pointer;font-size:13.5px;color:var(--ink)}
 .credit{text-align:center;font-size:11.5px;color:var(--muted)}
 .credit a{color:var(--muted)}
 
@@ -156,7 +160,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 .tabbar a[aria-current="page"]{color:var(--ink);background:var(--bg);box-shadow:inset 2px 2px 6px var(--lo), inset -2px -2px 6px var(--hi)}
 
 /* sheet + onboarding */
-.scrim{position:fixed;inset:0;background:rgba(20,24,40,.35);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.scrim{position:fixed;inset:0;background:rgba(40,34,24,.35);z-index:40;display:flex;align-items:flex-end;justify-content:center}
 .sheet{width:min(460px,100%);margin:0 10px calc(env(safe-area-inset-bottom,0px) + 10px);display:flex;flex-direction:column;gap:10px}
 .sheet .q{font-family:var(--display);font-size:18px;display:flex;align-items:center;gap:8px}
 .onb{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;
@@ -175,7 +179,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 <main>
   <!-- ===== วันนี้ ===== -->
   <section class="page" id="pg-today">
-    <header><h1>Squat 100</h1><span class="date" id="today-label"></span></header>
+    <header><div><h1>Squat Challenge</h1><div class="date">100 ครั้ง per day</div></div><span class="date" id="today-label"></span></header>
 
     <div class="clay hero">
       <div class="ring well">
@@ -218,6 +222,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
         <button class="btn dark" id="finish2" type="button"><svg class="ic sm"><use href="#i-checkmark"/></svg>จบเซ็ต</button>
       </div>
     </div>
+    <button class="btn mint" id="hk-send" type="button" hidden><svg class="ic sm"><use href="#i-heart"/></svg><span id="hk-txt">ส่งแคลเข้า Apple Health</span></button>
     <div style="text-align:center"><button class="btn ghost" id="undo-set" type="button" hidden>ลบเซ็ตล่าสุด</button></div>
   </section>
 
@@ -233,6 +238,20 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
       </div>
       <div class="bars well" id="bars"></div>
       <div class="blabels" id="blabels"></div>
+    </div>
+    <div class="clay">
+      <h2><svg class="ic sm"><use href="#i-person"/></svg>น้ำหนัก</h2>
+      <div class="trio">
+        <div class="kv"><div class="v" id="w-last">–</div><div class="l">ล่าสุด (กก.)</div></div>
+        <div class="kv"><div class="v" id="w-diff">–</div><div class="l" id="w-diff-l">เทียบครั้งแรก</div></div>
+        <div class="kv"><div class="v" id="w-bmi">–</div><div class="l">BMI</div></div>
+      </div>
+      <svg class="wchart well" id="w-chart" viewBox="0 0 300 120" preserveAspectRatio="none" aria-label="กราฟน้ำหนัก"></svg>
+      <div class="inrow">
+        <input id="w-in" type="number" inputmode="decimal" step="0.1" min="30" max="250" placeholder="น้ำหนักวันนี้ เช่น 79.6" aria-label="น้ำหนักวันนี้">
+        <button class="btn mint" id="w-save" type="button">บันทึก</button>
+      </div>
+      <p class="hint" id="w-hint">ชั่งตอนเช้าหลังเข้าห้องน้ำ วันละครั้งหรือสัปดาห์ละครั้ง ตัวเลขจะใช้คำนวณแคลให้ด้วย</p>
     </div>
     <div class="clay">
       <h2><svg class="ic sm"><use href="#i-flame"/></svg>แคลอรี่</h2>
@@ -294,6 +313,21 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
       <div class="item"><div class="top"><label class="name" for="r-pace">ความเร็วจังหวะ</label><span class="val"><span id="v-pace"></span> วิ/ครั้ง</span></div><input type="range" id="r-pace" min="1.5" max="5" step="0.1"></div>
     </div>
 
+    <h2 style="margin:4px 4px -4px"><svg class="ic sm"><use href="#i-heart"/></svg>Apple Health (iPhone)</h2>
+    <div class="clay group">
+      <div class="item"><div class="top"><span class="name">ส่งแคลและน้ำหนักเข้าแอปสุขภาพ</span><label class="switch"><input type="checkbox" id="sw-health" aria-label="ส่งเข้า Apple Health"><span></span></label></div>
+        <span class="sub">เว็บเขียนเข้าแอปสุขภาพตรงๆ ไม่ได้ จึงส่งผ่านแอป "คำสั่งลัด" (Shortcuts) ของ iPhone ต้องตั้งครั้งเดียวตามขั้นตอนด้านล่าง</span></div>
+      <div class="item"><details><summary>วิธีตั้งค่าคำสั่งลัด (ทำครั้งเดียว ~2 นาที)</summary>
+        <ol class="steps">
+          <li>เปิดแอป <b>คำสั่งลัด</b> (Shortcuts) กด <b>+</b> มุมขวาบน</li>
+          <li>แตะชื่อด้านบน ตั้งชื่อว่า <b>Squat100</b> (พิมพ์ให้ตรง ติดกัน)</li>
+          <li>กด <b>เพิ่มการทำงาน</b> ค้นหา <b>บันทึกตัวอย่างสุขภาพ</b> (Log Health Sample)</li>
+          <li>แตะประเภท เลือก <b>พลังงานที่ใช้งาน</b> (Active Energy) แล้วแตะช่องตัวเลข เลือก <b>อินพุตคำสั่งลัด</b> (Shortcut Input) หน่วย kcal</li>
+          <li>กดเสร็จ · ถ้าอยากส่งน้ำหนักด้วย ทำอีกอันชื่อ <b>Squat100 Weight</b> เลือกประเภท <b>น้ำหนัก</b> (Weight) หน่วย kg</li>
+          <li>กลับมาเปิดสวิตช์ด้านบน ครั้งแรกที่ส่ง iPhone จะถามสิทธิ์เขียนข้อมูลสุขภาพ กด <b>อนุญาต</b></li>
+        </ol></details></div>
+    </div>
+
     <h2 style="margin:4px 4px -4px"><svg class="ic sm"><use href="#i-wristwatch"/></svg>นาฬิกา</h2>
     <div class="clay group">
       <div class="item"><div class="top"><span class="name" id="w-t">ชีพจรสดผ่านบลูทูธ</span><button class="btn" id="w-btn" type="button" style="flex:none;padding-inline:14px">เชื่อม</button></div>
@@ -305,6 +339,9 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     <div class="clay group">
       <div class="item"><div class="top"><label class="name" for="r-met">ค่า MET (ความหนักของสควอต)</label><span class="val" id="v-met"></span></div><input type="range" id="r-met" min="3" max="8" step="0.5"></div>
       <div class="item"><button class="btn" id="reset" type="button"><svg class="ic sm"><use href="#i-trash-can"/></svg>ล้างข้อมูลทั้งหมด</button><span class="sub">ข้อมูลเก็บในมือถือเครื่องนี้เท่านั้น ล้างแล้วกู้คืนไม่ได้</span></div>
+    </div>
+    <div class="clay group" id="donate-box" hidden>
+      <div class="item"><div class="top"><span class="name">ชอบแอปนี้? เลี้ยงกาแฟคนทำได้นะ</span><a class="btn coral" id="donate" href="#" target="_blank" rel="noopener" style="flex:none;padding-inline:16px;text-decoration:none"><svg class="ic sm"><use href="#i-heart"/></svg>สนับสนุน</a></div></div>
     </div>
     <p class="credit">Icons by <a href="https://iconsaga.com" target="_blank" rel="noopener">IconSaga · iconsaga.com</a></p>
   </section>
@@ -330,7 +367,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 
 <section class="onb" id="onb" hidden aria-label="ตั้งค่าครั้งแรก">
   <div class="in">
-    <h1>Squat 100</h1>
+    <h1>Squat Challenge<br>100 ครั้ง per day</h1>
     <p>สควอตวันละ 100 ครั้ง แบ่งเป็นเซ็ตตลอดวัน แอปนับให้และคำนวณแคลอรี่จากข้อมูลร่างกายของคุณ ข้อมูลเก็บในมือถือเครื่องนี้เท่านั้น</p>
     <div class="clay group">
       <div class="item"><div class="top"><span class="name">เพศ</span></div>
@@ -350,10 +387,12 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 <script>
 (function(){
   const DEF = {weight:70, height:170, sex:"m", age:25, goal:100, per:25, every:2, from:"08:00", to:"22:00", pace:2.5, met:5.0,
-               remind:true, sound:true, voice:true, vibe:true, askHR:true};
+               remind:true, sound:true, voice:true, vibe:true, askHR:true, health:false};
   let settings = {...DEF};
   let days = {};
+  let weights = [];
   const LS = "squat100.web.v1";
+  const DONATE_URL = ""; // e.g. https://ko-fi.com/yourname — the support button stays hidden until this is set
 
   const $ = id => document.getElementById(id);
   const pad = n => String(n).padStart(2,"0");
@@ -368,7 +407,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
   function norm(v){
     if(typeof v === "number") return {sets: v>0 ? [{t:"", n:v}] : [], cur:0};
     if(!v || typeof v !== "object") return {sets:[], cur:0};
-    const sets = Array.isArray(v.sets) ? v.sets.filter(x=>x && typeof x.n==="number").map(x=>{ const o={t:String(x.t||""), n:x.n}; if(typeof x.hr==="number") o.hr=x.hr; return o; }) : [];
+    const sets = Array.isArray(v.sets) ? v.sets.filter(x=>x && typeof x.n==="number").map(x=>{ const o={t:String(x.t||""), n:x.n}; if(typeof x.hr==="number") o.hr=x.hr; if(x.hs) o.hs=1; return o; }) : [];
     const o = {sets, cur: typeof v.cur==="number" ? v.cur : 0};
     if(typeof v.target==="number") o.target = v.target;
     return o;
@@ -377,8 +416,8 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
   const day = (k=todayKey()) => (days[k] ||= {sets:[], cur:0});
   const curTarget = () => Math.max(1, day().target || settings.per);
 
-  function lsLoad(){ try{ const s = JSON.parse(localStorage.getItem(LS)||"null"); if(s){ days={}; for(const k in (s.days||{})) days[k]=norm(s.days[k]); settings = {...DEF, ...(s.settings||{})}; delete settings.sets; } }catch(e){} }
-  function save(){ try{ localStorage.setItem(LS, JSON.stringify({days, settings})); }catch(e){} }
+  function lsLoad(){ try{ const s = JSON.parse(localStorage.getItem(LS)||"null"); if(s){ days={}; for(const k in (s.days||{})) days[k]=norm(s.days[k]); settings = {...DEF, ...(s.settings||{})}; delete settings.sets; weights = Array.isArray(s.weights) ? s.weights.filter(w=>w && typeof w.kg==="number" && /^\d{4}-\d\d-\d\d$/.test(w.d)) : []; } }catch(e){} }
+  function save(){ try{ localStorage.setItem(LS, JSON.stringify({days, settings, weights})); }catch(e){} }
 
   let toastT=null;
   function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true, 3200); }
@@ -452,6 +491,9 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     while(remain > 0){ const v=Math.min(settings.per,remain); box.appendChild(chip("todo", v, "รอทำ")); remain-=v; }
     const nowChip = box.querySelector(".now"); if(nowChip && nowChip.scrollIntoView) try{ nowChip.scrollIntoView({block:"nearest", inline:"center"}); }catch(e){}
     $("undo-set").hidden = !D.sets.length;
+    const unsent = D.sets.filter(x=>!x.hs).reduce((a,x)=>a+setKcal(x),0);
+    $("hk-send").hidden = !(settings.health && unsent >= 0.05);
+    $("hk-txt").textContent = "ส่ง "+fmt(unsent,1)+" kcal เข้า Apple Health";
     $("set-no").textContent = D.sets.length+1; $("t-val").textContent = ps;
     $("tap-n").textContent = D.cur+" / "+ps;
     $("tap-bar").style.width = Math.min(100, D.cur/ps*100)+"%";
@@ -475,6 +517,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     const hm = settings.height/100, bmi = settings.weight/(hm*hm);
     $("bmi").textContent = fmt(bmi,1)+(bmi<18.5?" (น้อย)":bmi<23?" (ปกติ)":bmi<25?" (เกินเล็กน้อย)":bmi<30?" (อ้วนระดับ 1)":" (อ้วนระดับ 2)");
     renderVO2();
+    renderWeight();
   }
 
   const VO2B = {m:[[29,38,42,46,52],[39,36,40,44,50],[49,34,38,42,48],[59,31,35,39,45],[200,28,32,36,42]],
@@ -490,6 +533,46 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     $("vo2-band").textContent = VO2L[k];
     $("vo2-cmp").textContent = "เทียบ"+(settings.sex==="f"?"ผู้หญิง":"ผู้ชาย")+" "+settings.age+" ปี · ชีพจรพัก "+r;
   }
+
+  // ---- Apple Health via iOS Shortcuts
+  function runShortcut(name, value){
+    const back = location.href.split("#")[0];
+    location.href = "shortcuts://x-callback-url/run-shortcut?name="+encodeURIComponent(name)+"&input=text&text="+encodeURIComponent(value)+"&x-success="+encodeURIComponent(back+"#today")+"&x-cancel="+encodeURIComponent(back+"#today")+"&x-error="+encodeURIComponent(back+"#settings");
+  }
+  $("hk-send").addEventListener("click", ()=>{
+    const D = day(), list = D.sets.filter(x=>!x.hs), kcal = list.reduce((a,x)=>a+setKcal(x),0);
+    if(kcal < 0.05) return;
+    list.forEach(x=>x.hs=1); save(); render();
+    runShortcut("Squat100", kcal.toFixed(1));
+  });
+
+  // ---- weight log
+  function renderWeight(){
+    const W = weights.slice().sort((a,b)=>a.d<b.d?-1:1), c = $("w-chart");
+    const hm = settings.height/100;
+    if(!W.length){ $("w-last").textContent="–"; $("w-diff").textContent="–"; $("w-bmi").textContent=fmt(settings.weight/(hm*hm),1); c.innerHTML='<text x="150" y="64" text-anchor="middle" font-size="12" fill="var(--muted)">ยังไม่มีข้อมูล บันทึกน้ำหนักด้านล่าง</text>'; return; }
+    const last = W[W.length-1], first = W[0], diff = last.kg-first.kg;
+    $("w-last").textContent = fmt(last.kg,1); $("w-bmi").textContent = fmt(last.kg/(hm*hm),1);
+    $("w-diff").textContent = W.length>1 ? (diff>0?"+":"")+fmt(diff,1) : "–";
+    $("w-diff").style.color = W.length>1 ? (diff<0?"var(--coral)":diff>0?"var(--lilac)":"") : "";
+    $("w-diff-l").textContent = W.length>1 ? "กก. ตั้งแต่ "+new Date(first.d+"T12:00:00").toLocaleDateString("th-TH",{day:"numeric",month:"short"}) : "เทียบครั้งแรก";
+    const pts = W.slice(-30), lo = Math.min(...pts.map(w=>w.kg))-0.5, hi = Math.max(...pts.map(w=>w.kg))+0.5;
+    const X = i => pts.length===1 ? 150 : 14 + i*(272/(pts.length-1)), Y = kg => 100 - (kg-lo)/(hi-lo)*80;
+    let h = '<text x="6" y="16" font-size="10" fill="var(--muted)">'+fmt(hi,1)+'</text><text x="6" y="114" font-size="10" fill="var(--muted)">'+fmt(lo,1)+'</text>';
+    if(pts.length>1) h += '<polyline fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" points="'+pts.map((w,i)=>X(i)+","+Y(w.kg)).join(" ")+'"/>';
+    pts.forEach((w,i)=>{ h += '<circle cx="'+X(i)+'" cy="'+Y(w.kg)+'" r="'+(i===pts.length-1?4.5:3)+'" fill="'+(i===pts.length-1?"var(--ink)":"var(--coral)")+'"><title>'+w.d+": "+w.kg+' กก.</title></circle>'; });
+    c.innerHTML = h;
+  }
+  function saveWeight(){
+    const v = parseFloat($("w-in").value);
+    if(!(v>=30 && v<=250)){ toast("ใส่น้ำหนัก 30–250 กก."); return; }
+    const kg = Math.round(v*10)/10, d = todayKey();
+    weights = weights.filter(w=>w.d!==d); weights.push({d, kg});
+    settings.weight = kg; save(); fillSettings(); render(); $("w-in").value = "";
+    if(settings.health) runShortcut("Squat100 Weight", String(kg)); else toast("บันทึกน้ำหนัก "+kg+" กก. แล้ว");
+  }
+  $("w-save").addEventListener("click", saveWeight);
+  $("w-in").addEventListener("keydown", e=>{ if(e.key==="Enter") saveWeight(); });
 
   // ---- sound
   function buzz(p){ if(settings.vibe && navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
@@ -597,7 +680,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 
   // ---- settings controls
   const ranges = {weight:[1,"r-weight","v-weight"], height:[0,"r-height","v-height"], age:[0,"r-age","v-age"], goal:[0,"r-goal","v-goal"], per:[0,"r-per","v-per"], pace:[1,"r-pace","v-pace"], met:[1,"r-met","v-met"]};
-  const switches = {remind:"sw-remind", sound:"sw-sound", voice:"sw-voice", vibe:"sw-vibe", askHR:"sw-askhr"};
+  const switches = {health:"sw-health", remind:"sw-remind", sound:"sw-sound", voice:"sw-voice", vibe:"sw-vibe", askHR:"sw-askhr"};
   function fillSettings(){
     for(const [k,[d,r,v]] of Object.entries(ranges)){ $(r).value = settings[k]; $(v).textContent = fmt(+settings[k], d); }
     $("v-sets").textContent = "≈ "+Math.ceil(settings.goal/settings.per)+" เซ็ตต่อวัน";
@@ -627,7 +710,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
       const e=m+5;
       L.push("BEGIN:VEVENT","UID:squat100-"+ymd+"-"+(i++)+"-"+Math.random().toString(36).slice(2,8)+"@squat100","DTSTAMP:"+stamp,
         "DTSTART:"+ymd+"T"+pad(Math.floor(m/60))+pad(m%60)+"00","DTEND:"+ymd+"T"+pad(Math.floor(e/60))+pad(e%60)+"00","RRULE:FREQ=DAILY",
-        "SUMMARY:สควอต "+settings.per+" ครั้ง (Squat 100)","DESCRIPTION:ถึงเวลาสควอตเซ็ตถัดไป",
+        "SUMMARY:สควอต "+settings.per+" ครั้ง (Squat Challenge)","DESCRIPTION:ถึงเวลาสควอตเซ็ตถัดไป",
         "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:ถึงเวลาสควอตแล้ว","TRIGGER:PT0M","END:VALARM","END:VEVENT");
     }
     L.push("END:VCALENDAR");
@@ -688,11 +771,13 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
   $("o-go").addEventListener("click", ()=>{
     const g = parseInt($("o-goal").value,10);
     settings = {...settings, weight:parseFloat($("o-weight").value), height:parseInt($("o-height").value,10), age:parseInt($("o-age").value,10), sex:oSex, goal:g, per:Math.max(5, Math.round(g/4/5)*5), onboarded:true};
+    if(!weights.length) weights.push({d:todayKey(), kg:settings.weight});
     save(); fillSettings(); render(); $("onb").hidden = true;
   });
 
   // ---- start
   $("today-label").textContent = new Date().toLocaleDateString("th-TH",{weekday:"short", day:"numeric", month:"short"});
+  if(DONATE_URL){ $("donate").href = DONATE_URL; $("donate-box").hidden = false; }
   lsLoad(); fillSettings(); render(); route();
   try{ if(localStorage.getItem(LS+".mode")==="pace") mode("pace"); }catch(e){}
   if(!settings.onboarded) $("onb").hidden = false;
